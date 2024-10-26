@@ -335,11 +335,14 @@ fun StartViewLayout(
     content: @Composable () -> Unit,
 ) {
     ScreenSizeLayoutSelector(
+        modifier = modifier,
         normal = {
             ConstraintLayout(
                 modifier = Modifier
                     .wrapContentSize(Alignment.TopStart)
-                    .then(modifier)
+                    .widthIn(max = CONTENT_WIDTH)
+                    .align(Alignment.Center)
+                    .fillMaxSize()
             ) {
                 val (titleRef, centerBoxRef, bottomButtonRef, menuButtonRef) = createRefs()
                 Box(
