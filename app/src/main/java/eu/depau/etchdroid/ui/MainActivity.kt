@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,7 +27,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -72,7 +75,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
@@ -375,11 +380,15 @@ fun StartViewLayout(
                     menuButton()
                     dropdownMenu()
                 }
-
             }
         },
         compact = {
-            ConstraintLayout(modifier = modifier) {
+            ConstraintLayout(
+                Modifier
+                    .sizeIn(minWidth = 550.dp)
+                    .fillMaxSize()
+                    .horizontalScroll(rememberScrollState())
+            ) {
                 val (mainBox, bottomButtonRef) = createRefs()
 
                 Row(
@@ -392,7 +401,7 @@ fun StartViewLayout(
                     ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(Modifier.padding(32.dp)) {
+                    Box(Modifier.padding(16.dp)) {
                         logo()
                     }
                     Column(
