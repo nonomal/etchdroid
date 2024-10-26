@@ -399,12 +399,12 @@ fun StartViewLayout(
                         centerTo(parent)
                     },
                     horizontalArrangement = Arrangement.spacedBy(
-                        96.dp,
+                        80.dp,
                         Alignment.CenterHorizontally
                     ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(Modifier.padding(16.dp)) {
+                    Box(Modifier.padding(32.dp)) {
                         logo()
                     }
                     Column(
