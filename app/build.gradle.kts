@@ -113,6 +113,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.material.icons.extended)
     implementation(libs.material3)
+    implementation(libs.material3.adaptive)
     implementation(platform(libs.compose.bom))
 
     "gplayImplementation"(libs.gplay.review)
