@@ -15,7 +15,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +27,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -35,6 +35,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.HelpCenter
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.twotone.Check
 import androidx.compose.material.icons.twotone.Clear
 import androidx.compose.material.icons.twotone.Info
@@ -96,6 +97,7 @@ import eu.depau.etchdroid.massstorage.UsbMassStorageDeviceDescriptor
 import eu.depau.etchdroid.plugins.telemetry.Telemetry
 import eu.depau.etchdroid.plugins.telemetry.TelemetryLevel
 import eu.depau.etchdroid.ui.composables.MainView
+import eu.depau.etchdroid.ui.composables.ScreenSizeLayoutSelector
 import eu.depau.etchdroid.ui.composables.coloredShadow
 import eu.depau.etchdroid.ui.theme.notSupportedRed
 import eu.depau.etchdroid.ui.theme.partiallySupportedYellow
@@ -252,24 +254,24 @@ class MainActivity : ComponentActivity() {
         setContent {
             MainView(mViewModel) {
                 StartView(
-                        mViewModel,
-                        setThemeMode = { mSettings.themeMode = it },
-                        setDynamicTheme = { mSettings.dynamicColors = it },
-                        onCTAClick = {
-                            Telemetry.addBreadcrumb {
-                                message = "User clicked on Write an image"
-                                category = "flow"
-                                level = TelemetryLevel.DEBUG
-                            }
-                            mFilePickerActivity.launch()
-                        },
-                        openAboutView = {
-                            startActivity(Intent(this, AboutActivity::class.java))
-                        },
-                        setTelemetry = { enabled ->
-                            Telemetry.enabled = enabled
-                            mViewModel.setTelemetry(enabled)
+                    mViewModel,
+                    setThemeMode = { mSettings.themeMode = it },
+                    setDynamicTheme = { mSettings.dynamicColors = it },
+                    onCTAClick = {
+                        Telemetry.addBreadcrumb {
+                            message = "User clicked on Write an image"
+                            category = "flow"
+                            level = TelemetryLevel.DEBUG
                         }
+                        mFilePickerActivity.launch()
+                    },
+                    openAboutView = {
+                        startActivity(Intent(this, AboutActivity::class.java))
+                    },
+                    setTelemetry = { enabled ->
+                        Telemetry.enabled = enabled
+                        mViewModel.setTelemetry(enabled)
+                    }
                 )
                 val uiState by mViewModel.state.collectAsState()
                 if (uiState.showWindowsAlertForUri != null) {
@@ -327,57 +329,96 @@ fun StartViewLayout(
     dropdownMenu: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
-    ConstraintLayout(
-            modifier = modifier
-    ) {
-        val (titleRef, centerBoxRef, bottomButtonRef, menuButtonRef, dropdownRef) = createRefs()
-        Box(
-                modifier = Modifier.constrainAs(titleRef) {
-                    top.linkTo(parent.top, 24.dp)
-                    start.linkTo(parent.start, 16.dp)
-                    end.linkTo(parent.end, 16.dp)
+    ScreenSizeLayoutSelector(
+        normal = {
+            ConstraintLayout(
+                modifier = Modifier
+                    .wrapContentSize(Alignment.TopStart)
+                    .then(modifier)
+            ) {
+                val (titleRef, centerBoxRef, bottomButtonRef, menuButtonRef) = createRefs()
+                Box(
+                    modifier = Modifier.constrainAs(titleRef) {
+                        top.linkTo(parent.top, 24.dp)
+                        start.linkTo(parent.start, 16.dp)
+                        end.linkTo(parent.end, 16.dp)
+                    }
+                ) {
+                    title()
                 }
-        ) {
-            title()
-        }
 
-        Column(
-                modifier = Modifier.constrainAs(centerBoxRef) {
-                    top.linkTo(parent.top, 16.dp)
+                Column(
+                    modifier = Modifier.constrainAs(centerBoxRef) {
+                        top.linkTo(parent.top, 16.dp)
+                        bottom.linkTo(parent.bottom, 16.dp)
+                        start.linkTo(parent.start, 16.dp)
+                        end.linkTo(parent.end, 16.dp)
+                    }, horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(64.dp)
+                ) {
+                    logo()
+                    mainButton()
+                }
+
+                Box(modifier = Modifier.constrainAs(bottomButtonRef) {
                     bottom.linkTo(parent.bottom, 16.dp)
                     start.linkTo(parent.start, 16.dp)
                     end.linkTo(parent.end, 16.dp)
-                }, horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(64.dp)
-        ) {
-            logo()
-            mainButton()
-        }
+                }) {
+                    bottomButton()
+                }
 
-        Box(modifier = Modifier.constrainAs(bottomButtonRef) {
-            bottom.linkTo(parent.bottom, 16.dp)
-            start.linkTo(parent.start, 16.dp)
-            end.linkTo(parent.end, 16.dp)
-        }) {
-            bottomButton()
-        }
+                Box(modifier = Modifier.constrainAs(menuButtonRef) {
+                    bottom.linkTo(parent.bottom, 16.dp)
+                    end.linkTo(parent.end, 16.dp)
+                }) {
+                    menuButton()
+                    dropdownMenu()
+                }
 
-        Box(modifier = Modifier.constrainAs(menuButtonRef) {
-            bottom.linkTo(parent.bottom, 16.dp)
-            end.linkTo(parent.end, 16.dp)
-        }) {
-            menuButton()
-        }
+            }
+        },
+        compact = {
+            ConstraintLayout(modifier = modifier) {
+                val (mainBox, bottomButtonRef) = createRefs()
 
-        Box(modifier = Modifier.constrainAs(dropdownRef) {
-            bottom.linkTo(menuButtonRef.top)
-            end.linkTo(parent.end, 16.dp)
-        }) {
-            dropdownMenu()
-        }
+                Row(
+                    modifier = Modifier.constrainAs(mainBox) {
+                        centerTo(parent)
+                    },
+                    horizontalArrangement = Arrangement.spacedBy(
+                        96.dp,
+                        Alignment.CenterHorizontally
+                    ),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(Modifier.padding(32.dp)) {
+                        logo()
+                    }
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(24.dp)
+                    ) {
+                        title()
+                        mainButton()
+                        bottomButton()
+                    }
+                }
 
-        content()
-    }
+                Box(
+                    modifier = Modifier.constrainAs(bottomButtonRef) {
+                        bottom.linkTo(parent.bottom, 16.dp)
+                        start.linkTo(mainBox.end, 16.dp)
+                    }
+                ) {
+                    menuButton()
+                    dropdownMenu()
+                }
+            }
+        }
+    )
+
+    content()
 }
 
 @Composable
@@ -405,182 +446,187 @@ fun StartView(
             }
         }
     }
+    val menuScrollState = rememberScrollState()
 
     StartViewLayout(
-            modifier = Modifier.fillMaxSize(),
-            title = {
-                Text(
-                        text = "EtchDroid",
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 28.sp),
-                )
-            },
-            logo = {
-                Icon(
-                        modifier = Modifier
-                            .size(128.dp)
-                            .run {
-                                if (darkMode) {
-                                    coloredShadow(
-                                            MaterialTheme.colorScheme.onSecondaryContainer,
-                                            borderRadius = 64.dp,
-                                            shadowRadius = 128.dp,
-                                            alpha = 0.5f
-                                    )
-                                } else {
-                                    drawBehind {
-                                        drawCircle(
-                                                color = iconBackgroundColor, radius = 96.dp.toPx()
-                                        )
-                                    }
-                                }
-                            }, imageVector = getEtchDroidIcon(
-                        headColor = if (darkMode) MaterialTheme.colorScheme.primary.toArgb()
-                            .toLong() else MaterialTheme.colorScheme.primaryContainer.toArgb()
-                            .toLong(),
-                ), contentDescription = "EtchDroid", tint = Color.Unspecified
-                )
-            },
-            mainButton = {
-                ExtendedFloatingActionButton(
-                        onClick = onCTAClick,
-                        text = { Text(stringResource(R.string.write_an_image)) },
-                        icon = {
-                            Icon(
-                                    imageVector = ImageVector.vectorResource(
-                                            id = R.drawable.ic_write_to_usb
-                                    ), contentDescription = null
+        modifier = Modifier.fillMaxSize(),
+        title = {
+            Text(
+                text = "EtchDroid",
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 28.sp),
+            )
+        },
+        logo = {
+            Icon(
+                modifier = Modifier
+                    .size(128.dp)
+                    .run {
+                        if (darkMode) {
+                            coloredShadow(
+                                MaterialTheme.colorScheme.onSecondaryContainer,
+                                borderRadius = 64.dp,
+                                shadowRadius = 128.dp,
+                                alpha = 0.5f
                             )
-                        },
-                )
-            },
-            bottomButton = {
-                OutlinedButton(onClick = { whatCanIWriteOpen = true }) {
-                    Text(stringResource(R.string.whats_supported))
-                }
-            },
-            menuButton = {
-                IconButton(onClick = { menuOpen = true }) {
-                    Icon(
-                            modifier = Modifier.size(20.dp),
-                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_menu),
-                            contentDescription = "Menu"
-                    )
-                }
-            },
-            dropdownMenu = {
-                DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                    Text(
-                            stringResource(R.string.style),
-                            style = MaterialTheme.typography.labelMedium,
-                            modifier = Modifier.padding(12.dp, 0.dp)
-                    )
-
-                    // Radio buttons for theme modes SYSTEM, LIGHT, DARK
-                    DropdownMenuItem(
-                            onClick = { setThemeMode(ThemeMode.SYSTEM) },
-                            text = { Text(stringResource(R.string.device_setting)) },
-                            leadingIcon = {
-                        RadioButton(modifier = Modifier.size(20.dp),
-                                selected = uiState.themeMode == ThemeMode.SYSTEM,
-                                onClick = { setThemeMode(ThemeMode.SYSTEM) })
-                    })
-                    DropdownMenuItem(onClick = { setThemeMode(ThemeMode.LIGHT) },
-                            text = { Text(stringResource(R.string.light)) }, leadingIcon = {
-                        RadioButton(modifier = Modifier.size(20.dp),
-                                selected = uiState.themeMode == ThemeMode.LIGHT,
-                                onClick = { setThemeMode(ThemeMode.LIGHT) })
-                    })
-                    DropdownMenuItem(onClick = { setThemeMode(ThemeMode.DARK) },
-                            text = { Text(stringResource(R.string.dark)) }, leadingIcon = {
-                        RadioButton(modifier = Modifier.size(20.dp),
-                                selected = uiState.themeMode == ThemeMode.DARK,
-                                onClick = { setThemeMode(ThemeMode.DARK) })
-                    })
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        DropdownMenuItem(
-                                onClick = { setDynamicTheme(!uiState.dynamicColors) },
-                                text = { Text(stringResource(R.string.dynamic_colors)) },
-                                leadingIcon = {
-                            Checkbox(modifier = Modifier.size(20.dp),
-                                    checked = uiState.dynamicColors,
-                                    onCheckedChange = { setDynamicTheme(!uiState.dynamicColors) })
-                        })
-                    }
-
-                    if (!Telemetry.isStub) {
-                        HorizontalDivider()
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                                stringResource(R.string.telemetry),
-                                style = MaterialTheme.typography.labelMedium,
-                                modifier = Modifier.padding(12.dp, 0.dp)
-                        )
-
-                        fun toggleTelemetry() {
-                            val checked = uiState.telemetry
-                            if (checked) {
-                                telemetryDialogOpen = true
-                            } else {
-                                setTelemetry(true)
+                        } else {
+                            drawBehind {
+                                drawCircle(
+                                    color = iconBackgroundColor, radius = 96.dp.toPx()
+                                )
                             }
                         }
+                    }, imageVector = getEtchDroidIcon(
+                    headColor = if (darkMode) MaterialTheme.colorScheme.primary.toArgb()
+                        .toLong() else MaterialTheme.colorScheme.primaryContainer.toArgb()
+                        .toLong(),
+                ), contentDescription = "EtchDroid", tint = Color.Unspecified
+            )
+        },
+        mainButton = {
+            ExtendedFloatingActionButton(
+                onClick = onCTAClick,
+                text = { Text(stringResource(R.string.write_an_image)) },
+                icon = {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(
+                            id = R.drawable.ic_write_to_usb
+                        ), contentDescription = null
+                    )
+                },
+            )
+        },
+        bottomButton = {
+            OutlinedButton(onClick = { whatCanIWriteOpen = true }) {
+                Text(stringResource(R.string.whats_supported))
+            }
+        },
+        menuButton = {
+            IconButton(onClick = { menuOpen = true }) {
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "Menu"
+                )
+            }
+        },
+        dropdownMenu = {
+            DropdownMenu(
+                expanded = menuOpen,
+                scrollState = menuScrollState,
+                onDismissRequest = { menuOpen = false },
+            ) {
+                Text(
+                    stringResource(R.string.style),
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.padding(12.dp, 0.dp)
+                )
 
-                        DropdownMenuItem(
-                                onClick = { toggleTelemetry() },
-                                text = { Text("Send anonymous data") },
-                                leadingIcon = {
-                                    Checkbox(modifier = Modifier.size(20.dp),
-                                            checked = Telemetry.enabled,
-                                            onCheckedChange = { toggleTelemetry() }
-                                    )
-                                }
-                        )
+                // Radio buttons for theme modes SYSTEM, LIGHT, DARK
+                DropdownMenuItem(
+                    onClick = { setThemeMode(ThemeMode.SYSTEM) },
+                    text = { Text(stringResource(R.string.device_setting)) },
+                    leadingIcon = {
+                        RadioButton(modifier = Modifier.size(20.dp),
+                            selected = uiState.themeMode == ThemeMode.SYSTEM,
+                            onClick = { setThemeMode(ThemeMode.SYSTEM) })
+                    })
+                DropdownMenuItem(onClick = { setThemeMode(ThemeMode.LIGHT) },
+                    text = { Text(stringResource(R.string.light)) }, leadingIcon = {
+                        RadioButton(modifier = Modifier.size(20.dp),
+                            selected = uiState.themeMode == ThemeMode.LIGHT,
+                            onClick = { setThemeMode(ThemeMode.LIGHT) })
+                    })
+                DropdownMenuItem(onClick = { setThemeMode(ThemeMode.DARK) },
+                    text = { Text(stringResource(R.string.dark)) }, leadingIcon = {
+                        RadioButton(modifier = Modifier.size(20.dp),
+                            selected = uiState.themeMode == ThemeMode.DARK,
+                            onClick = { setThemeMode(ThemeMode.DARK) })
+                    })
 
-                        val context = LocalContext.current
-                        DropdownMenuItem(
-                                onClick = {
-                                    context.startActivity(
-                                            Intent(
-                                                    Intent.ACTION_VIEW,
-                                                    Uri.parse(PRIVACY_URL)
-                                            )
-                                    )
-                                },
-                                text = { Text(stringResource(R.string.privacy_policy)) },
-                                leadingIcon = {
-                                    Icon(
-                                            imageVector = Icons.TwoTone.Policy,
-                                            contentDescription = stringResource(R.string.privacy_policy)
-                                    )
-                                }
-                        )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    DropdownMenuItem(
+                        onClick = { setDynamicTheme(!uiState.dynamicColors) },
+                        text = { Text(stringResource(R.string.dynamic_colors)) },
+                        leadingIcon = {
+                            Checkbox(modifier = Modifier.size(20.dp),
+                                checked = uiState.dynamicColors,
+                                onCheckedChange = { setDynamicTheme(!uiState.dynamicColors) })
+                        })
+                }
+
+                if (!Telemetry.isStub) {
+                    HorizontalDivider()
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        stringResource(R.string.telemetry),
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.padding(12.dp, 0.dp)
+                    )
+
+                    fun toggleTelemetry() {
+                        val checked = uiState.telemetry
+                        if (checked) {
+                            telemetryDialogOpen = true
+                        } else {
+                            setTelemetry(true)
+                        }
                     }
 
-                    HorizontalDivider()
+                    DropdownMenuItem(
+                        onClick = { toggleTelemetry() },
+                        text = { Text("Send anonymous data") },
+                        leadingIcon = {
+                            Checkbox(modifier = Modifier.size(20.dp),
+                                checked = Telemetry.enabled,
+                                onCheckedChange = { toggleTelemetry() }
+                            )
+                        }
+                    )
 
-                    DropdownMenuItem(onClick = { openAboutView() },
-                            text = { Text(stringResource(R.string.about)) }, leadingIcon = {
+                    val context = LocalContext.current
+                    DropdownMenuItem(
+                        onClick = {
+                            context.startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse(PRIVACY_URL)
+                                )
+                            )
+                        },
+                        text = { Text(stringResource(R.string.privacy_policy)) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.TwoTone.Policy,
+                                contentDescription = stringResource(R.string.privacy_policy)
+                            )
+                        }
+                    )
+                }
+
+                HorizontalDivider()
+
+                DropdownMenuItem(onClick = { openAboutView() },
+                    text = { Text(stringResource(R.string.about)) }, leadingIcon = {
                         Icon(
-                                imageVector = Icons.TwoTone.Info,
-                                contentDescription = stringResource(R.string.about)
+                            imageVector = Icons.TwoTone.Info,
+                            contentDescription = stringResource(R.string.about)
                         )
                     })
-                }
-            },
+            }
+        },
     ) {
         if (whatCanIWriteOpen) {
             WhatCanIWriteBottomSheet(
-                    onDismissRequest = {
-                        whatCanIWriteOpen = false
-                    }, darkTheme = darkMode
+                onDismissRequest = {
+                    whatCanIWriteOpen = false
+                }, darkTheme = darkMode
             )
         }
         if (telemetryDialogOpen) {
             TelemetryAlertDialog(
-                    onDismissRequest = { telemetryDialogOpen = false },
-                    onOptOut = { setTelemetry(false) },
-                    onCancel = { setTelemetry(true) }
+                onDismissRequest = { telemetryDialogOpen = false },
+                onOptOut = { setTelemetry(false) },
+                onCancel = { setTelemetry(true) }
             )
         }
     }
@@ -636,22 +682,22 @@ fun TelemetryAlertDialog(
         append(text)
 
         addStyle(
-                style = SpanStyle(
-                        color = MaterialTheme.colorScheme.primary,
-                        textDecoration = TextDecoration.Underline
-                ), start = startIndex, end = endIndex
+            style = SpanStyle(
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline
+            ), start = startIndex, end = endIndex
         )
         addLink(LinkAnnotation.Url(PRIVACY_URL), startIndex, endIndex)
     }
     Text(
-            modifier = Modifier.verticalScroll(scrollState),
-            text = annotatedString,
-            style = MaterialTheme.typography.bodyMedium.copy(lineBreak = LineBreak.Paragraph),
+        modifier = Modifier.verticalScroll(scrollState),
+        text = annotatedString,
+        style = MaterialTheme.typography.bodyMedium.copy(lineBreak = LineBreak.Paragraph),
     )
 }, icon = {
     Icon(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_telemetry),
-            contentDescription = stringResource(R.string.telemetry_icon)
+        imageVector = ImageVector.vectorResource(id = R.drawable.ic_telemetry),
+        contentDescription = stringResource(R.string.telemetry_icon)
     )
 }, confirmButton = {
     TextButton(onClick = {
@@ -763,8 +809,8 @@ fun ItemSupportEntry(
                 SupportStatus.MAYBE_SUPPORTED -> stringResource(R.string.maybe_supported)
                 SupportStatus.UNSUPPORTED -> stringResource(R.string.not_supported)
             }, modifier = Modifier
-            .size(20.dp)
-            .padding(0.dp, 4.dp, 0.dp, 0.dp),
+                .size(20.dp)
+                .padding(0.dp, 4.dp, 0.dp, 0.dp),
             tint = when (supportStatus) {
                 SupportStatus.SUPPORTED -> supportedGreen(darkTheme)
                 SupportStatus.MAYBE_SUPPORTED -> partiallySupportedYellow(darkTheme)
@@ -934,17 +980,17 @@ fun WhatCanIWriteBottomSheet(onDismissRequest: () -> Unit, darkTheme: Boolean = 
                         ), start = startIndex, end = endIndex
                     )
                     addLink(
-                            LinkAnnotation.Url("https://github.com/EtchDroid/EtchDroid/releases/tag/dmg-support"),
-                            startIndex,
-                            endIndex
+                        LinkAnnotation.Url("https://github.com/EtchDroid/EtchDroid/releases/tag/dmg-support"),
+                        startIndex,
+                        endIndex
                     )
                 }
                 Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 32.dp),
-                        text = annotatedString,
-                        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onBackground)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 32.dp),
+                    text = annotatedString,
+                    style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onBackground)
                 )
             }
         }
@@ -997,7 +1043,7 @@ fun TelemetryAlertDialogPreview() {
 
     MainView(viewModel) {
         TelemetryAlertDialog(onDismissRequest = { /*TODO*/ }, onOptOut = { /*TODO*/ },
-                onCancel = { /*TODO*/ })
+            onCancel = { /*TODO*/ })
     }
 }
 
@@ -1007,10 +1053,10 @@ fun UsbDevicePickerBottomSheetPreview() {
     val viewModel = remember { MainActivityViewModel() }
     var openBottomSheet by rememberSaveable { mutableStateOf(true) }
     val availableDevices = setOf(
-            object : IUsbMassStorageDeviceDescriptor {
-                override val name: String = "USB Drive"
-                override val vidpid: String = "1234:5678"
-            }
+        object : IUsbMassStorageDeviceDescriptor {
+            override val name: String = "USB Drive"
+            override val vidpid: String = "1234:5678"
+        }
     )
 
     MainView(viewModel) {
