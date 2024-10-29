@@ -304,7 +304,9 @@ fun JobInProgressViewLayout(
         modifier = modifier,
         normal = {
             Column(
-                modifier = modifier.verticalScroll(rememberScrollState()),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
