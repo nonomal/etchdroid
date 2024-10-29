@@ -741,44 +741,94 @@ fun SuccessViewLayout(
     buttons: @Composable FlowRowScope.() -> Unit,
     bottomCard: @Composable () -> Unit,
 ) {
-    Column(
-        modifier = modifier.verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-
-        Box(
-            Modifier
-                .padding(48.dp, 48.dp, 48.dp, 16.dp)
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            title()
-        }
-
-        Box(
-            Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            animation()
-        }
-
-        Column(
-            Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+    ScreenSizeLayoutSelector(
+        modifier = modifier,
+        normal = {
+            Column(
+                modifier = Modifier
+                    .wrapContentSize(Alignment.TopStart)
+                    .widthIn(max = CONTENT_WIDTH)
+                    .align(Alignment.Center)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                buttons()
+
+                Box(
+                    Modifier
+                        .padding(48.dp, 48.dp, 48.dp, 16.dp)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    title()
+                }
+
+                Box(
+                    Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    animation()
+                }
+
+                Column(
+                    Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(
+                            8.dp,
+                            Alignment.CenterHorizontally
+                        )
+                    ) {
+                        buttons()
+                    }
+                    bottomCard()
+                }
             }
-            bottomCard()
+        },
+        compact = {
+            Row(
+                modifier = modifier
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.4f)
+                        .fillMaxHeight(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    animation()
+                }
+
+                Column(
+                    modifier = Modifier
+                        .padding(32.dp)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    title()
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(
+                            8.dp,
+                            Alignment.CenterHorizontally
+                        )
+                    ) {
+                        buttons()
+                    }
+                    bottomCard()
+                }
+            }
         }
-    }
+    )
 }
 
 
@@ -989,7 +1039,8 @@ fun FatalErrorViewLayout(
                     }
                 }
             }
-        })
+        }
+    )
 }
 
 @OptIn(ExperimentalLayoutApi::class)
