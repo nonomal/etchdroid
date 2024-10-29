@@ -46,7 +46,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -103,11 +107,11 @@ import eu.depau.etchdroid.getStartJobIntent
 import eu.depau.etchdroid.massstorage.EtchDroidUsbMassStorageDevice.Companion.isMassStorageDevice
 import eu.depau.etchdroid.massstorage.UsbMassStorageDeviceDescriptor
 import eu.depau.etchdroid.massstorage.doesNotMatch
+import eu.depau.etchdroid.plugins.reviews.WriteReviewHelper
 import eu.depau.etchdroid.plugins.telemetry.Telemetry
 import eu.depau.etchdroid.plugins.telemetry.Telemetry.telemetryTag
 import eu.depau.etchdroid.plugins.telemetry.TelemetryLevel
 import eu.depau.etchdroid.plugins.telemetry.TelemetryTraced
-import eu.depau.etchdroid.plugins.reviews.WriteReviewHelper
 import eu.depau.etchdroid.service.WorkerService
 import eu.depau.etchdroid.ui.composables.GifImage
 import eu.depau.etchdroid.ui.composables.KeepScreenOn
@@ -162,11 +166,12 @@ class ProgressActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, IntentFilter().apply {
-            addAction(Intents.JOB_PROGRESS)
-            addAction(Intents.ERROR)
-            addAction(Intents.FINISHED)
-        })
+        LocalBroadcastManager.getInstance(this)
+            .registerReceiver(mBroadcastReceiver, IntentFilter().apply {
+                addAction(Intents.JOB_PROGRESS)
+                addAction(Intents.ERROR)
+                addAction(Intents.FINISHED)
+            })
     }
 
     override fun onPause() {
@@ -186,7 +191,8 @@ class ProgressActivity : ComponentActivity() {
         if (mNotificationManager.areNotificationsEnabled()) return refreshNotificationsPermission()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !mPermissionAsked && shouldShowRequestPermissionRationale(
                 permission.POST_NOTIFICATIONS
-            )) {
+            )
+        ) {
             mPermissionAsked = true
             Telemetry.addBreadcrumb("Requesting notifications runtime permission", "notifications")
             return mNotificationPermissionRequester.launch(permission.POST_NOTIFICATIONS)
@@ -266,10 +272,10 @@ class ProgressActivity : ComponentActivity() {
                     JobState.FATAL_ERROR -> {
                         TelemetryTraced("fatal_error_screen") {
                             FatalErrorView(
-                                    exception = appState.exception!! as FatalException,
-                                    imageUri = appState.sourceUri!!,
-                                    jobId = appState.jobId,
-                                    device = appState.destDevice!!
+                                exception = appState.exception!! as FatalException,
+                                imageUri = appState.sourceUri!!,
+                                jobId = appState.jobId,
+                                device = appState.destDevice!!
                             )
                         }
                     }
@@ -290,49 +296,54 @@ fun JobInProgressViewLayout(
     notificationsBanner: @Composable () -> Unit,
     progress: @Composable ColumnScope.() -> Unit,
 ) {
-    ConstraintLayout(modifier = modifier) {
-        val (titleRef, subtitleRef, graphicRef, progressBoxRef, notificationsBannerRef) = createRefs()
+    Column(
+        modifier = modifier.verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-        Box(modifier = Modifier.constrainAs(titleRef) {
-            top.linkTo(parent.top, 48.dp)
-            start.linkTo(parent.start, 16.dp)
-            end.linkTo(parent.end, 16.dp)
-        }) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp, 48.dp, 16.dp, 16.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             title()
-        }
-
-        Box(modifier = Modifier.constrainAs(subtitleRef) {
-            top.linkTo(titleRef.bottom, 8.dp)
-            start.linkTo(parent.start, 16.dp)
-            end.linkTo(parent.end, 16.dp)
-        }) {
             subTitle()
         }
 
-        Row(modifier = Modifier.constrainAs(graphicRef) {
-                centerTo(parent)
+        ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+            val (graphicRef, notificationsBannerRef) = createRefs()
+
+            graphic(
+                Modifier
+                    .fillMaxWidth()
+                    .constrainAs(graphicRef) {
+                        centerTo(parent)
+                    })
+
+            if (showNotificationsBanner) {
+                Box(modifier = Modifier.constrainAs(notificationsBannerRef) {
+                    bottom.linkTo(graphicRef.bottom)
+                    centerHorizontallyTo(parent)
+                }) {
+                    notificationsBanner()
+                }
             }
-        ) {
-            graphic(Modifier.fillMaxWidth())
         }
 
-
-        if (showNotificationsBanner) {
-            Box(modifier = Modifier.constrainAs(notificationsBannerRef) {
-                bottom.linkTo(progressBoxRef.top, 16.dp)
-                start.linkTo(parent.start, 16.dp)
-                end.linkTo(parent.end, 16.dp)
-            }) {
-                notificationsBanner()
+        Box {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .wrapContentSize(Alignment.TopStart)
+                    .widthIn(max = CONTENT_WIDTH)
+                    .align(Alignment.Center)
+                    .fillMaxWidth()
+            ) {
+                progress()
             }
-        }
-
-        Column(modifier = Modifier.constrainAs(progressBoxRef) {
-            start.linkTo(parent.start, 16.dp)
-            end.linkTo(parent.end, 16.dp)
-            bottom.linkTo(parent.bottom, 16.dp)
-        }) {
-            progress()
         }
     }
 }
@@ -348,295 +359,302 @@ fun JobInProgressView(
 
     KeepScreenOn()
     JobInProgressViewLayout(
-            modifier = Modifier.fillMaxSize(),
-            title = {
-                Text(
-                        text = if (uiState.isVerifying) stringResource(
-                                R.string.verifying_image
-                        ) else stringResource(
-                                R.string.writing_image
-                        ),
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 28.sp),
-                )
-            },
-            subTitle = {
-                Text(
-                        text = stringResource(R.string.please_avoid_using_your_device),
-                        style = MaterialTheme.typography.titleLarge
-                )
-            },
-            graphic = {
-                var clickLastTime by remember { mutableStateOf(0L) }
-                var clickCount by remember { mutableStateOf(0) }
-                var easterEgg by remember { mutableStateOf(false) }
+        modifier = Modifier.fillMaxSize(),
+        title = {
+            Text(
+                text = if (uiState.isVerifying) stringResource(
+                    R.string.verifying_image
+                ) else stringResource(
+                    R.string.writing_image
+                ),
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 28.sp),
+                textAlign = TextAlign.Center
+            )
+        },
+        subTitle = {
+            Text(
+                text = stringResource(R.string.please_avoid_using_your_device),
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center
+            )
+        },
+        graphic = {
+            var clickLastTime by remember { mutableStateOf(0L) }
+            var clickCount by remember { mutableStateOf(0) }
+            var easterEgg by remember { mutableStateOf(false) }
 
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        val now = System.currentTimeMillis()
-                        if (now - clickLastTime < 500) {
-                            clickCount++
-                            if (clickCount >= 5) {
-                                clickCount = 0
-                                easterEgg = !easterEgg
-                                Telemetry.addBreadcrumb {
-                                    message = "Easter egg activated: $easterEgg"
-                                    category = "easter_egg"
-                                    level = TelemetryLevel.DEBUG
-                                }
-                            }
-                        } else {
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    val now = System.currentTimeMillis()
+                    if (now - clickLastTime < 500) {
+                        clickCount++
+                        if (clickCount >= 5) {
                             clickCount = 0
+                            easterEgg = !easterEgg
+                            Telemetry.addBreadcrumb {
+                                message = "Easter egg activated: $easterEgg"
+                                category = "easter_egg"
+                                level = TelemetryLevel.DEBUG
+                            }
                         }
-                        clickLastTime = now
-                    }) {
-                    if (easterEgg) {
-                        GifImage(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .padding(bottom = 56.dp, start = 16.dp, end = 16.dp),
-                                gifRes = if (uiState.isVerifying) R.drawable.win_xp_verify else R.drawable.win_xp_copy
-                        )
                     } else {
-                        ConstraintLayout(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(256.dp)
-                        ) {
-                            val (usbDrive, imagesRow, magnifyingGlass) = createRefs()
-
-                            val numberOfImages = 3
-                            val imageWidth = 64
-                            val density = LocalDensity.current
-                            var rowSize by remember { mutableStateOf(IntSize.Zero) }
-                            val repeatWidth by remember(rowSize) {
-                                derivedStateOf {
-                                    val dpWidth = with(density) { rowSize.width.toDp() }.value
-                                    (dpWidth - (imageWidth * numberOfImages)) / (numberOfImages - 1) + imageWidth
-                                }
-                            }
-
-                            val anchorTransition =
-                                rememberInfiniteTransition(label = "anchorTransition")
-                            val anchor by anchorTransition.animateValue(
-                                    initialValue = if (uiState.isVerifying) 100.dp else (100 + repeatWidth).dp,
-                                    targetValue = if (uiState.isVerifying) (100 + repeatWidth).dp else 100.dp,
-                                    typeConverter = TwoWayConverter(convertToVector = {
-                                        AnimationVector1D(
-                                                it.value
-                                        )
-                                    },
-                                            convertFromVector = { it.value.dp }),
-                                    animationSpec = infiniteRepeatable(
-                                            animation = tween(2000, easing = LinearEasing),
-                                            repeatMode = RepeatMode.Restart
-                                    ),
-                                    label = "anchor"
-                            )
-
-                            Row(modifier = Modifier
-                                .constrainAs(imagesRow) {
-                                    centerVerticallyTo(usbDrive)
-                                    if (uiState.isVerifying) {
-                                        start.linkTo(usbDrive.start, anchor)
-                                    } else {
-                                        end.linkTo(usbDrive.end, anchor)
-                                    }
-                                }
-                                .padding(bottom = 32.dp)
-                                .fillMaxWidth()
-                                .onSizeChanged {
-                                    rowSize = it
-                                }, horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                for (i in 0 until numberOfImages) Icon(
-                                        imageVector = ImageVector.vectorResource(
-                                                id = R.drawable.ic_disk_image_large
-                                        ),
-                                        modifier = Modifier.size(imageWidth.dp),
-                                        contentDescription = "",
-                                )
-                            }
-
-                            val bgColor = MaterialTheme.colorScheme.background
-                            Icon(
-                                    imageVector = ImageVector.vectorResource(
-                                            id = R.drawable.ic_usb_stick_large
-                                    ),
-                                    modifier = Modifier
-                                        .constrainAs(usbDrive) {
-                                            centerTo(parent)
-                                        }
-                                        .padding(
-                                                if (uiState.isVerifying) PaddingValues(
-                                                        end = 128.dp
-                                                ) else PaddingValues(start = 128.dp)
-                                        )
-                                        .drawBehind {
-                                            drawRect(bgColor,
-                                                    topLeft = with(density) {
-                                                        Offset(
-                                                                88.dp.toPx(),
-                                                                22.dp.toPx()
-                                                        )
-                                                    },
-                                                    size = with(density) {
-                                                        DpSize(
-                                                                80.dp,
-                                                                180.dp
-                                                        ).toSize()
-                                                    })
-                                        }
-                                        .size(256.dp),
-                                    contentDescription = "",
-                            )
-
-                            if (uiState.isVerifying) {
-                                Icon(
-                                        imageVector = ImageVector.vectorResource(
-                                                id = R.drawable.ic_magnifying_glass
-                                        ),
-                                        modifier = Modifier
-                                            .constrainAs(magnifyingGlass) {
-                                                top.linkTo(imagesRow.top, 24.dp)
-                                                start.linkTo(usbDrive.start, 224.dp)
-                                            }
-                                            .size(96.dp),
-                                        contentDescription = "",
-                                )
-                            }
-                        }
+                        clickCount = 0
                     }
-                }
-
-            },
-            showNotificationsBanner = uiState.showNotificationsBanner && !uiState.notificationsPermission,
-            notificationsBanner = {
-                Card(
-                        modifier = Modifier.padding(16.dp),
-                        elevation = CardDefaults.elevatedCardElevation(6.dp)
-                ) {
-                    Column(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                                text = stringResource(R.string.would_you_like_to_be_notified),
-                        )
-                        Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
-                        ) {
-                            OutlinedButton(
-                                    modifier = Modifier.telemetryTag("notifications_dismiss_button"),
-                                    onClick = dismissNotificationsBanner
-                            ) {
-                                Telemetry.addBreadcrumb(
-                                        "User dismissed notifications banner",
-                                        "notifications"
-                                )
-                                Text(text = stringResource(R.string.no_thanks))
-                            }
-                            Button(
-                                    modifier = Modifier.telemetryTag("notifications_enable_button"),
-                                    onClick = requestNotificationsPermission
-                            ) {
-                                Telemetry.addBreadcrumb(
-                                        "User requested notifications",
-                                        "notifications"
-                                )
-                                Text(text = stringResource(R.string.sure))
-                            }
-                        }
-                    }
-                }
-            },
-            progress = {
-                Column(
-                        modifier = Modifier.padding(horizontal = 32.dp)
-                ) {
-                    val context = LocalContext.current
-                    Row(
-                            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                                text = if (uiState.isVerifying) stringResource(R.string.verifying) else stringResource(
-                                        R.string.copying
-                                )
-                        )
-                        Text(
-                                text = " " + if (uiState.isVerifying) uiState.destDevice?.name
-                                else uiState.sourceUri?.getDisplayName(context),
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                    Row(
-                            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                                text = if (uiState.isVerifying) stringResource(
-                                        R.string.against
-                                ) else stringResource(R.string.to)
-                        )
-                        Text(
-                                text = " " + if (uiState.isVerifying) uiState.sourceUri?.getDisplayName(
-                                        context
-                                )
-                                else uiState.destDevice?.name,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-
-                    Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp),
-                            text = if (uiState.percent >= 0) "${uiState.processedBytes.toHRSize()} / ${uiState.totalBytes.toHRSize()}" + " ${if (uiState.isVerifying) "verified" else "written"}, ${uiState.speed.toHRSize()}/s"
-                            else stringResource(R.string.getting_ready), style = MaterialTheme.typography.titleMedium,
-                            textAlign = TextAlign.Center
-                    )
-                }
-
-                if (uiState.percent >= 0) {
-                    LinearProgressIndicator(
-                            progress = { uiState.percent / 100f },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 32.dp),
-                            color = MaterialTheme.colorScheme.primary
+                    clickLastTime = now
+                }) {
+                if (easterEgg) {
+                    GifImage(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .padding(bottom = 56.dp, start = 16.dp, end = 16.dp),
+                        gifRes = if (uiState.isVerifying) R.drawable.win_xp_verify else R.drawable.win_xp_copy
                     )
                 } else {
-                    LinearProgressIndicator(
+                    ConstraintLayout(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(256.dp)
+                    ) {
+                        val (usbDrive, imagesRow, magnifyingGlass) = createRefs()
+
+                        val numberOfImages = 3
+                        val imageWidth = 64
+                        val density = LocalDensity.current
+                        var rowSize by remember { mutableStateOf(IntSize.Zero) }
+                        val repeatWidth by remember(rowSize) {
+                            derivedStateOf {
+                                val dpWidth = with(density) { rowSize.width.toDp() }.value
+                                (dpWidth - (imageWidth * numberOfImages)) / (numberOfImages - 1) + imageWidth
+                            }
+                        }
+
+                        val anchorTransition =
+                            rememberInfiniteTransition(label = "anchorTransition")
+                        val anchor by anchorTransition.animateValue(
+                            initialValue = if (uiState.isVerifying) 100.dp else (100 + repeatWidth).dp,
+                            targetValue = if (uiState.isVerifying) (100 + repeatWidth).dp else 100.dp,
+                            typeConverter = TwoWayConverter(convertToVector = {
+                                AnimationVector1D(
+                                    it.value
+                                )
+                            },
+                                convertFromVector = { it.value.dp }),
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(2000, easing = LinearEasing),
+                                repeatMode = RepeatMode.Restart
+                            ),
+                            label = "anchor"
+                        )
+
+                        Row(modifier = Modifier
+                            .constrainAs(imagesRow) {
+                                centerVerticallyTo(usbDrive)
+                                if (uiState.isVerifying) {
+                                    start.linkTo(usbDrive.start, anchor)
+                                } else {
+                                    end.linkTo(usbDrive.end, anchor)
+                                }
+                            }
+                            .padding(bottom = 32.dp)
+                            .fillMaxWidth()
+                            .onSizeChanged {
+                                rowSize = it
+                            }, horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            for (i in 0 until numberOfImages) Icon(
+                                imageVector = ImageVector.vectorResource(
+                                    id = R.drawable.ic_disk_image_large
+                                ),
+                                modifier = Modifier.size(imageWidth.dp),
+                                contentDescription = "",
+                            )
+                        }
+
+                        val bgColor = MaterialTheme.colorScheme.background
+                        Icon(
+                            imageVector = ImageVector.vectorResource(
+                                id = R.drawable.ic_usb_stick_large
+                            ),
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 32.dp),
-                            color = MaterialTheme.colorScheme.primary
+                                .constrainAs(usbDrive) {
+                                    centerTo(parent)
+                                }
+                                .padding(
+                                    if (uiState.isVerifying) PaddingValues(
+                                        end = 128.dp
+                                    ) else PaddingValues(start = 128.dp)
+                                )
+                                .drawBehind {
+                                    drawRect(bgColor,
+                                        topLeft = with(density) {
+                                            Offset(
+                                                88.dp.toPx(),
+                                                22.dp.toPx()
+                                            )
+                                        },
+                                        size = with(density) {
+                                            DpSize(
+                                                80.dp,
+                                                180.dp
+                                            ).toSize()
+                                        })
+                                }
+                                .size(256.dp),
+                            contentDescription = "",
+                        )
+
+                        if (uiState.isVerifying) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(
+                                    id = R.drawable.ic_magnifying_glass
+                                ),
+                                modifier = Modifier
+                                    .constrainAs(magnifyingGlass) {
+                                        top.linkTo(imagesRow.top, 24.dp)
+                                        start.linkTo(usbDrive.start, 224.dp)
+                                    }
+                                    .size(96.dp),
+                                contentDescription = "",
+                            )
+                        }
+                    }
+                }
+            }
+
+        },
+        showNotificationsBanner = uiState.showNotificationsBanner && !uiState.notificationsPermission,
+        notificationsBanner = {
+            Card(
+                modifier = Modifier.padding(16.dp),
+                elevation = CardDefaults.elevatedCardElevation(6.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.would_you_like_to_be_notified),
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
+                    ) {
+                        OutlinedButton(
+                            modifier = Modifier.telemetryTag("notifications_dismiss_button"),
+                            onClick = dismissNotificationsBanner
+                        ) {
+                            Telemetry.addBreadcrumb(
+                                "User dismissed notifications banner",
+                                "notifications"
+                            )
+                            Text(text = stringResource(R.string.no_thanks))
+                        }
+                        Button(
+                            modifier = Modifier.telemetryTag("notifications_enable_button"),
+                            onClick = requestNotificationsPermission
+                        ) {
+                            Telemetry.addBreadcrumb(
+                                "User requested notifications",
+                                "notifications"
+                            )
+                            Text(text = stringResource(R.string.sure))
+                        }
+                    }
+                }
+            }
+        },
+        progress = {
+            Column(
+                modifier = Modifier.padding(horizontal = 32.dp)
+            ) {
+                val context = LocalContext.current
+                Row(
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = if (uiState.isVerifying) stringResource(R.string.verifying) else stringResource(
+                            R.string.copying
+                        )
+                    )
+                    Text(
+                        text = " " + if (uiState.isVerifying) uiState.destDevice?.name
+                        else uiState.sourceUri?.getDisplayName(context),
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = if (uiState.isVerifying) stringResource(
+                            R.string.against
+                        ) else stringResource(R.string.to)
+                    )
+                    Text(
+                        text = " " + if (uiState.isVerifying) uiState.sourceUri?.getDisplayName(
+                            context
+                        )
+                        else uiState.destDevice?.name,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
 
-                if (uiState.isVerifying) {
-                    OutlinedButton(
-                            modifier = Modifier
-                                .telemetryTag("skip_verification_button")
-                                .fillMaxWidth()
-                                .padding(horizontal = 32.dp),
-                            onClick = cancelVerification
-                    ) {
-                        Text(text = stringResource(R.string.skip_verification))
-                    }
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    text = if (uiState.percent >= 0) "${uiState.processedBytes.toHRSize()} / ${uiState.totalBytes.toHRSize()}" + " ${if (uiState.isVerifying) "verified" else "written"}, ${uiState.speed.toHRSize()}/s"
+                    else stringResource(R.string.getting_ready),
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            if (uiState.percent >= 0) {
+                LinearProgressIndicator(
+                    progress = { uiState.percent / 100f },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 32.dp),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            } else {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 32.dp),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            if (uiState.isVerifying) {
+                OutlinedButton(
+                    modifier = Modifier
+                        .telemetryTag("skip_verification_button")
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp),
+                    onClick = cancelVerification
+                ) {
+                    Text(text = stringResource(R.string.skip_verification))
                 }
-            },
+            }
+        },
     )
 
     if (uiState.jobState == JobState.RECOVERABLE_ERROR && uiState.exception != null && uiState.exception is RecoverableException) {
         AutoJobRestarter(
-            uiState.sourceUri!!, uiState.jobId, uiState.isVerifying, uiState.destDevice!!, uiState.processedBytes
+            uiState.sourceUri!!,
+            uiState.jobId,
+            uiState.isVerifying,
+            uiState.destDevice!!,
+            uiState.processedBytes
         )
         ReconnectUsbDriveDialog(exception = uiState.exception as RecoverableException)
     }
@@ -658,7 +676,7 @@ fun SuccessViewLayout(
         Column(modifier = Modifier
             .constrainAs(stuffBoxRef) { centerTo(parent) }
             .padding(32.dp), verticalArrangement = Arrangement.spacedBy(32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally) {
+            horizontalAlignment = Alignment.CenterHorizontally) {
             title()
             animation()
 
@@ -666,8 +684,8 @@ fun SuccessViewLayout(
             val reviewHelper = remember { activity?.let { WriteReviewHelper(it) } }
 
             FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
             ) {
                 buttons()
             }
@@ -688,123 +706,123 @@ fun SuccessViewLayout(
 @Composable
 fun SuccessView() {
     SuccessViewLayout(
-            modifier = Modifier.fillMaxSize(),
-            title = {
-                Text(
-                        text = stringResource(R.string.image_written_successfully),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 28.sp),
+        modifier = Modifier.fillMaxSize(),
+        title = {
+            Text(
+                text = stringResource(R.string.image_written_successfully),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 28.sp),
+            )
+        },
+        animation = {
+            val composition by rememberLottieComposition(
+                LottieCompositionSpec.RawRes(R.raw.animated_check)
+            )
+
+            Column(
+                modifier = Modifier.padding(32.dp),
+                verticalArrangement = Arrangement.spacedBy(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+
+                val progress by animateLottieCompositionAsState(composition)
+                val lottieDynamicProperties = rememberLottieDynamicProperties(
+                    rememberLottieDynamicProperty(
+                        property = LottieProperty.COLOR_FILTER,
+                        value = PorterDuffColorFilter(
+                            MaterialTheme.colorScheme.primary.toArgb(),
+                            PorterDuff.Mode.SRC_ATOP
+                        ),
+                        keyPath = arrayOf("**")
+                    )
                 )
-            },
-            animation = {
-                val composition by rememberLottieComposition(
-                        LottieCompositionSpec.RawRes(R.raw.animated_check)
+                LottieAnimation(
+                    composition, progress = { progress }, modifier = Modifier.size(256.dp),
+                    dynamicProperties = lottieDynamicProperties
                 )
 
+            }
+        },
+        buttons = {
+            val activity = LocalContext.current.activity
+            val reviewHelper = remember { activity?.let { WriteReviewHelper(it) } }
+
+            if (reviewHelper != null) {
+                OutlinedButton(onClick = { reviewHelper.launchReviewFlow() }) {
+                    Text(
+                        text = if (reviewHelper.isGPlayFlavor) stringResource(
+                            R.string.write_a_review
+                        )
+                        else stringResource(R.string.star_on_github)
+                    )
+                }
+            }
+            OutlinedButton(onClick = {
+                activity?.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://etchdroid.app/donate/")
+                    )
+                )
+            }) {
+                Text(stringResource(R.string.support_the_project))
+            }
+            val context = LocalContext.current
+            OutlinedButton(onClick = {
+                context.startActivity(Intent(context, MainActivity::class.java).apply {
+                    flags =
+                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+                activity?.finish()
+            }) {
+                Text(stringResource(R.string.write_another_image))
+            }
+        },
+        bottomCard = {
+            Card(modifier = Modifier.padding(16.dp)) {
                 Column(
-                        modifier = Modifier.padding(32.dp),
-                        verticalArrangement = Arrangement.spacedBy(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-
-
-                    val progress by animateLottieCompositionAsState(composition)
-                    val lottieDynamicProperties = rememberLottieDynamicProperties(
-                            rememberLottieDynamicProperty(
-                                    property = LottieProperty.COLOR_FILTER,
-                                    value = PorterDuffColorFilter(
-                                            MaterialTheme.colorScheme.primary.toArgb(),
-                                            PorterDuff.Mode.SRC_ATOP
-                                    ),
-                                    keyPath = arrayOf("**")
-                            )
-                    )
-                    LottieAnimation(
-                            composition, progress = { progress }, modifier = Modifier.size(256.dp),
-                            dynamicProperties = lottieDynamicProperties
+                    Text(
+                        text = stringResource(R.string.got_an_unsupported_drive_notification),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
                     )
 
-                }
-            },
-            buttons = {
-                val activity = LocalContext.current.activity
-                val reviewHelper = remember { activity?.let { WriteReviewHelper(it) } }
-
-                if (reviewHelper != null) {
-                    OutlinedButton(onClick = { reviewHelper.launchReviewFlow() }) {
-                        Text(
-                                text = if (reviewHelper.isGPlayFlavor) stringResource(
-                                        R.string.write_a_review
-                                )
-                                else stringResource(R.string.star_on_github)
+                    val annotatedString = buildAnnotatedString {
+                        val learnMoreStr = stringResource(R.string.learn_what_it_means)
+                        val str = stringResource(R.string.it_s_safe_to_ignore, learnMoreStr)
+                        val startIndex = str.indexOf(learnMoreStr)
+                        val endIndex = startIndex + learnMoreStr.length
+                        append(str)
+                        addStyle(
+                            style = SpanStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                textDecoration = TextDecoration.Underline
+                            ), start = startIndex, end = endIndex
+                        )
+                        addLink(
+                            LinkAnnotation.Url("https://etchdroid.app/broken_usb/"),
+                            startIndex,
+                            endIndex
                         )
                     }
-                }
-                OutlinedButton(onClick = {
-                    activity?.startActivity(
-                            Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse("https://etchdroid.app/donate/")
-                            )
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = annotatedString,
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     )
-                }) {
-                    Text(stringResource(R.string.support_the_project))
                 }
-                val context = LocalContext.current
-                OutlinedButton(onClick = {
-                    context.startActivity(Intent(context, MainActivity::class.java).apply {
-                        flags =
-                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    })
-                    activity?.finish()
-                }) {
-                    Text(stringResource(R.string.write_another_image))
-                }
-            },
-            bottomCard = {
-                Card(modifier = Modifier.padding(16.dp)) {
-                    Column(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                                text = stringResource(R.string.got_an_unsupported_drive_notification),
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                textAlign = TextAlign.Center
-                        )
-
-                        val annotatedString = buildAnnotatedString {
-                            val learnMoreStr = stringResource(R.string.learn_what_it_means)
-                            val str = stringResource(R.string.it_s_safe_to_ignore, learnMoreStr)
-                            val startIndex = str.indexOf(learnMoreStr)
-                            val endIndex = startIndex + learnMoreStr.length
-                            append(str)
-                            addStyle(
-                                    style = SpanStyle(
-                                            color = MaterialTheme.colorScheme.primary,
-                                            textDecoration = TextDecoration.Underline
-                                    ), start = startIndex, end = endIndex
-                            )
-                            addLink(
-                                    LinkAnnotation.Url("https://etchdroid.app/broken_usb/"),
-                                    startIndex,
-                                    endIndex
-                            )
-                        }
-                        Text(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = annotatedString,
-                                style = MaterialTheme.typography.labelMedium.copy(
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                        )
-                    }
-                }
-            },
+            }
+        },
     )
 }
 
@@ -823,13 +841,13 @@ fun FatalErrorViewLayout(
         val stuffBoxRef = createRef()
 
         Column(
-                modifier = Modifier
-                    .constrainAs(stuffBoxRef) {
-                        centerTo(parent)
-                    }
-                    .padding(32.dp),
-                verticalArrangement = Arrangement.spacedBy(32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .constrainAs(stuffBoxRef) {
+                    centerTo(parent)
+                }
+                .padding(32.dp),
+            verticalArrangement = Arrangement.spacedBy(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             val context = LocalContext.current
             title()
@@ -838,8 +856,8 @@ fun FatalErrorViewLayout(
             icon()
 
             FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
             ) {
                 buttons()
             }
@@ -856,81 +874,81 @@ fun FatalErrorView(
     device: UsbMassStorageDeviceDescriptor,
 ) {
     FatalErrorViewLayout(
-            modifier = Modifier.fillMaxSize(),
-            title = {
-                Text(
-                        text = stringResource(R.string.there_was_an_error),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 28.sp),
-                )
-            },
-            message = {
-                val context = LocalContext.current
-                Text(
-                        text = exception.getUiMessage(context),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            },
-            suggestion = {
-                Text(
-                        text = stringResource(R.string.please_report_fatal_issue),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            },
-            icon = {
-                Icon(
-                        imageVector = ImageVector.vectorResource(
-                                id = R.drawable.ic_write_to_usb_failed_large
-                        ),
-                        contentDescription = stringResource(R.string.error),
-                        modifier = Modifier.size(256.dp),
-                )
-            },
-            buttons = {
-                val context = LocalContext.current
-                val activity = context.activity
-                OutlinedButton(onClick = {
-                    activity?.startActivity(
-                            Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse("https://github.com/EtchDroid/EtchDroid/issues")
-                            )
+        modifier = Modifier.fillMaxSize(),
+        title = {
+            Text(
+                text = stringResource(R.string.there_was_an_error),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 28.sp),
+            )
+        },
+        message = {
+            val context = LocalContext.current
+            Text(
+                text = exception.getUiMessage(context),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
+        suggestion = {
+            Text(
+                text = stringResource(R.string.please_report_fatal_issue),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
+        icon = {
+            Icon(
+                imageVector = ImageVector.vectorResource(
+                    id = R.drawable.ic_write_to_usb_failed_large
+                ),
+                contentDescription = stringResource(R.string.error),
+                modifier = Modifier.size(256.dp),
+            )
+        },
+        buttons = {
+            val context = LocalContext.current
+            val activity = context.activity
+            OutlinedButton(onClick = {
+                activity?.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://github.com/EtchDroid/EtchDroid/issues")
                     )
-                }) {
-                    Text(text = stringResource(R.string.view_github_issues))
-                }
+                )
+            }) {
+                Text(text = stringResource(R.string.view_github_issues))
+            }
 
-                if (exception is VerificationFailedException && activity != null) {
-                    Button(onClick = {
-                        val serviceIntent = getStartJobIntent(
-                                imageUri,
-                                device,
-                                jobId,
-                                0,
-                                false,
-                                activity,
-                                WorkerService::class.java
-                        )
-                        Log.d(TAG, "Starting service with intent: $serviceIntent")
-                        activity.startForegroundServiceCompat(serviceIntent)
-                    }) {
-                        Text(stringResource(R.string.try_again))
-                    }
-                }
-
-                Button({
-                    context.startActivity(Intent(context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    })
-                    activity?.finish()
+            if (exception is VerificationFailedException && activity != null) {
+                Button(onClick = {
+                    val serviceIntent = getStartJobIntent(
+                        imageUri,
+                        device,
+                        jobId,
+                        0,
+                        false,
+                        activity,
+                        WorkerService::class.java
+                    )
+                    Log.d(TAG, "Starting service with intent: $serviceIntent")
+                    activity.startForegroundServiceCompat(serviceIntent)
                 }) {
-                    Text(text = stringResource(R.string.start_over))
+                    Text(stringResource(R.string.try_again))
                 }
             }
+
+            Button({
+                context.startActivity(Intent(context, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+                activity?.finish()
+            }) {
+                Text(text = stringResource(R.string.start_over))
+            }
+        }
     )
 }
 
@@ -953,8 +971,9 @@ fun AutoJobRestarter(
     } else {
         0
     }
-    val pendingIntentFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE or forceFlag
-    else 0
+    val pendingIntentFlags =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE or forceFlag
+        else 0
     val pendingIntent = remember {
         PendingIntent.getBroadcast(
             activity, 0, Intent(Intents.USB_PERMISSION), pendingIntentFlags
@@ -1002,7 +1021,13 @@ fun AutoJobRestarter(
                     } else {
                         activity.toast(context.getString(R.string.usb_device_reconnected_resuming))
                         val serviceIntent = getStartJobIntent(
-                            imageUri, msd, jobId, resumeOffset, isVerifying, activity, WorkerService::class.java
+                            imageUri,
+                            msd,
+                            jobId,
+                            resumeOffset,
+                            isVerifying,
+                            activity,
+                            WorkerService::class.java
                         )
                         Log.d(TAG, "Starting service with intent: $serviceIntent")
                         activity.startForegroundServiceCompat(serviceIntent)
@@ -1016,7 +1041,10 @@ fun AutoJobRestarter(
         Log.d(TAG, "Registering broadcast receiver")
         activity.apply {
             registerExportedReceiver(broadcastReceiver, IntentFilter(Intents.USB_PERMISSION))
-            registerExportedReceiver(broadcastReceiver, IntentFilter(UsbManager.ACTION_USB_DEVICE_ATTACHED))
+            registerExportedReceiver(
+                broadcastReceiver,
+                IntentFilter(UsbManager.ACTION_USB_DEVICE_ATTACHED)
+            )
             for (usbDevice in usbManager.deviceList.values) onUsbAttached(usbDevice)
         }
         onDispose {
@@ -1041,7 +1069,10 @@ fun WriteErrorViewPreview() {
     val viewModel = remember { ProgressActivityViewModel() }
     MainView(viewModel) {
         FatalErrorView(
-                exception = NotEnoughSpaceException(1234, 5678), Uri.EMPTY, 1337, UsbMassStorageDeviceDescriptor()
+            exception = NotEnoughSpaceException(1234, 5678),
+            Uri.EMPTY,
+            1337,
+            UsbMassStorageDeviceDescriptor()
         )
     }
 }
@@ -1052,7 +1083,10 @@ fun VerificationErrorViewPreview() {
     val viewModel = remember { ProgressActivityViewModel() }
     MainView(viewModel) {
         FatalErrorView(
-            exception = VerificationFailedException(), Uri.EMPTY, 1337, UsbMassStorageDeviceDescriptor()
+            exception = VerificationFailedException(),
+            Uri.EMPTY,
+            1337,
+            UsbMassStorageDeviceDescriptor()
         )
     }
 }
@@ -1069,24 +1103,24 @@ fun ExceptionCardsPreview() {
         ) {
             item {
                 RecoverableExceptionExplanationCard(
-                        exception = UsbCommunicationException(
-                                LibusbException("yolo", LibusbError.NO_DEVICE)
-                        )
+                    exception = UsbCommunicationException(
+                        LibusbException("yolo", LibusbError.NO_DEVICE)
+                    )
                 )
             }
             item {
                 RecoverableExceptionExplanationCard(
-                        exception = UsbCommunicationException()
+                    exception = UsbCommunicationException()
                 )
             }
             item {
                 RecoverableExceptionExplanationCard(
-                        exception = InitException("yolo")
+                    exception = InitException("yolo")
                 )
             }
             item {
                 RecoverableExceptionExplanationCard(
-                        exception = MissingPermissionException()
+                    exception = MissingPermissionException()
                 )
             }
         }
@@ -1099,7 +1133,7 @@ fun ReconnectUsbDriveDialogPreview() {
     val viewModel = remember { ProgressActivityViewModel() }
     MainView(viewModel) {
         ReconnectUsbDriveDialog(
-                UsbCommunicationException(LibusbException("yolo", LibusbError.NO_DEVICE))
+            UsbCommunicationException(LibusbException("yolo", LibusbError.NO_DEVICE))
         )
     }
 }
@@ -1107,19 +1141,27 @@ fun ReconnectUsbDriveDialogPreview() {
 @PreviewScreenSizes
 @Composable
 fun ProgressViewPreview() {
-    val viewModel = remember { ProgressActivityViewModel() }
-    val progressTransition = rememberInfiniteTransition()
+    val viewModel = remember {
+        ProgressActivityViewModel().apply {
+            setState(state.value.copy(showNotificationsBanner = false))
+        }
+    }
+
+    val progressTransition = rememberInfiniteTransition(label = "progressTransition")
     val progress by progressTransition.animateFloat(
         initialValue = 0f, targetValue = 2f, animationSpec = infiniteRepeatable(
             animation = tween(10000, easing = LinearEasing), repeatMode = RepeatMode.Restart
-        )
+        ),
+        label = "progress"
     )
     LaunchedEffect(progress) {
         viewModel.setState(
             viewModel.state.value.copy(
                 percent = ((progress * 100) % 100).toInt(),
-                processedBytes = ((progress * 1000000000) % 1000000000).toLong(), totalBytes = 1000000000,
-                speed = 10000000f, isVerifying = progress > 1
+                processedBytes = ((progress * 1000000000) % 1000000000).toLong(),
+                totalBytes = 1000000000,
+                speed = 10000000f,
+                isVerifying = progress > 1
             )
         )
     }
@@ -1132,6 +1174,11 @@ fun ProgressViewPreview() {
                     viewModel.state.value.copy(showNotificationsBanner = false)
                 )
             },
+            cancelVerification = {
+                viewModel.setState(
+                    viewModel.state.value.copy(showNotificationsBanner = true)
+                )
+            }
         )
     }
 }
