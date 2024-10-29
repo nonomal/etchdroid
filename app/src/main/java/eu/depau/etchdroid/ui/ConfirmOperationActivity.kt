@@ -349,33 +349,30 @@ fun ConfirmationViewLayout(
     ScreenSizeLayoutSelector(
         modifier = modifier,
         normal = {
-            ConstraintLayout(
+            Column(
                 modifier = Modifier
                     .wrapContentSize(Alignment.TopStart)
                     .widthIn(max = CONTENT_WIDTH)
                     .align(Alignment.Center)
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                val (titleRef, cardsRef, warningCardRef, cancelButtonRef, confirmButtonRef) = createRefs()
 
-                Box(Modifier.constrainAs(titleRef) {
-                    top.linkTo(parent.top, 24.dp)
-                    start.linkTo(parent.start, 16.dp)
-                    end.linkTo(parent.end, 16.dp)
-                }) {
+                Box(
+                    Modifier
+                        .padding(24.dp)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
                     title()
                 }
 
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
-                        .constrainAs(cardsRef) {
-                            top.linkTo(titleRef.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            bottom.linkTo(warningCardRef.top)
-                        }, verticalArrangement = Arrangement.spacedBy(16.dp)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     sourceCard(Modifier.fillMaxWidth(), false)
 
@@ -393,26 +390,20 @@ fun ConfirmationViewLayout(
                     destinationCard(Modifier.fillMaxWidth())
                 }
 
-                Box(modifier = Modifier.constrainAs(warningCardRef) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(confirmButtonRef.top, 16.dp)
-                }) {
-                    warningCard()
-                }
+                Column {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        warningCard()
+                    }
 
-                Box(modifier = Modifier.constrainAs(cancelButtonRef) {
-                    bottom.linkTo(parent.bottom, 16.dp)
-                    end.linkTo(confirmButtonRef.start, 8.dp)
-                }) {
-                    cancelButton()
-                }
-
-                Box(modifier = Modifier.constrainAs(confirmButtonRef) {
-                    bottom.linkTo(parent.bottom, 16.dp)
-                    end.linkTo(parent.end, 16.dp)
-                }) {
-                    confirmButton()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End)
+                    ) {
+                        cancelButton()
+                        confirmButton()
+                    }
                 }
             }
         },
@@ -473,7 +464,9 @@ fun ConfirmationViewLayout(
                 warningCard()
 
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End)
                 ) {
                     cancelButton()
