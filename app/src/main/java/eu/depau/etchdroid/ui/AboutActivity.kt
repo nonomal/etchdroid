@@ -20,8 +20,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -48,7 +46,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
 import eu.depau.etchdroid.AppSettings
 import eu.depau.etchdroid.BuildConfig
 import eu.depau.etchdroid.PRIVACY_URL
@@ -97,56 +94,43 @@ fun AboutViewLayout(
     ScreenSizeLayoutSelector(
         modifier = modifier,
         normal = {
-            ConstraintLayout(
+            Column(
                 modifier = Modifier
-                    .wrapContentSize(Alignment.TopStart)
-                    .widthIn(max = CONTENT_WIDTH)
                     .align(Alignment.Center)
-                    .padding(32.dp)
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(48.dp)
             ) {
-                val boxRef = createRef()
-
                 Column(
                     modifier = Modifier
-                        .constrainAs(boxRef) {
-                            centerTo(parent)
-                        }
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(48.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        appTitle()
-                        versionInfo()
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(32.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        logo()
-                    }
+                    appTitle()
+                    versionInfo()
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(32.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    logo()
+                }
 
-                    contributorsInfo()
+                contributorsInfo()
 
-                    FlowRow(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(
-                            8.dp,
-                            Alignment.CenterHorizontally
-                        )
-                    ) {
-                        actionButtons()
-                    }
-
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        8.dp,
+                        Alignment.CenterHorizontally
+                    )
+                ) {
+                    actionButtons()
                 }
 
             }
