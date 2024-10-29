@@ -741,32 +741,41 @@ fun SuccessViewLayout(
     buttons: @Composable FlowRowScope.() -> Unit,
     bottomCard: @Composable () -> Unit,
 ) {
-    ConstraintLayout(modifier = modifier) {
-        val (stuffBoxRef, cardRef) = createRefs()
+    Column(
+        modifier = modifier.verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
 
-        Column(modifier = Modifier
-            .constrainAs(stuffBoxRef) { centerTo(parent) }
-            .padding(32.dp), verticalArrangement = Arrangement.spacedBy(32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            Modifier
+                .padding(48.dp, 48.dp, 48.dp, 16.dp)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
             title()
+        }
+
+        Box(
+            Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
             animation()
+        }
 
-            val activity = LocalContext.current.activity
-            val reviewHelper = remember { activity?.let { WriteReviewHelper(it) } }
-
+        Column(
+            Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
             ) {
                 buttons()
             }
-        }
-
-        Box(modifier = Modifier.constrainAs(cardRef) {
-            bottom.linkTo(parent.bottom)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-        }) {
             bottomCard()
         }
     }
