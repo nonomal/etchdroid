@@ -367,7 +367,7 @@ fun JobInProgressViewLayout(
                 ConstraintLayout(
                     modifier = Modifier
                         .wrapContentSize(Alignment.TopStart)
-                        .fillMaxWidth(0.5f)
+                        .fillMaxWidth(0.4f)
                         .fillMaxHeight()
                 ) {
                     val (graphicRef, notificationsBannerRef) = createRefs()
