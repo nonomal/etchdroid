@@ -41,6 +41,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.FlowRowScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -70,6 +71,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.toArgb
@@ -118,6 +120,7 @@ import eu.depau.etchdroid.ui.composables.KeepScreenOn
 import eu.depau.etchdroid.ui.composables.MainView
 import eu.depau.etchdroid.ui.composables.ReconnectUsbDriveDialog
 import eu.depau.etchdroid.ui.composables.RecoverableExceptionExplanationCard
+import eu.depau.etchdroid.ui.composables.ScreenSizeLayoutSelector
 import eu.depau.etchdroid.utils.broadcastReceiver
 import eu.depau.etchdroid.utils.exception.InitException
 import eu.depau.etchdroid.utils.exception.MissingPermissionException
@@ -296,56 +299,119 @@ fun JobInProgressViewLayout(
     notificationsBanner: @Composable () -> Unit,
     progress: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(
-        modifier = modifier.verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
 
-        Column(
-            modifier = Modifier
-                .padding(16.dp, 48.dp, 16.dp, 16.dp)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            title()
-            subTitle()
-        }
+    ScreenSizeLayoutSelector(
+        modifier = modifier,
+        normal = {
+            Column(
+                modifier = modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-        ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
-            val (graphicRef, notificationsBannerRef) = createRefs()
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp, 48.dp, 16.dp, 16.dp)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    title()
+                    subTitle()
+                }
 
-            graphic(
-                Modifier
-                    .fillMaxWidth()
-                    .constrainAs(graphicRef) {
-                        centerTo(parent)
-                    })
+                ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+                    val (graphicRef, notificationsBannerRef) = createRefs()
 
-            if (showNotificationsBanner) {
-                Box(modifier = Modifier.constrainAs(notificationsBannerRef) {
-                    bottom.linkTo(graphicRef.bottom)
-                    centerHorizontallyTo(parent)
-                }) {
-                    notificationsBanner()
+                    graphic(
+                        Modifier
+                            .fillMaxWidth()
+                            .constrainAs(graphicRef) {
+                                centerTo(parent)
+                            })
+
+                    if (showNotificationsBanner) {
+                        Box(modifier = Modifier.constrainAs(notificationsBannerRef) {
+                            bottom.linkTo(graphicRef.bottom)
+                            centerHorizontallyTo(parent)
+                        }) {
+                            notificationsBanner()
+                        }
+                    }
+                }
+
+                Box {
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .wrapContentSize(Alignment.TopStart)
+                            .widthIn(max = CONTENT_WIDTH)
+                            .align(Alignment.Center)
+                            .fillMaxWidth()
+                    ) {
+                        progress()
+                    }
+                }
+            }
+        },
+        compact = {
+            Row(
+                modifier = modifier
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                ConstraintLayout(
+                    modifier = Modifier
+                        .wrapContentSize(Alignment.TopStart)
+                        .fillMaxWidth(0.5f)
+                        .fillMaxHeight()
+                ) {
+                    val (graphicRef, notificationsBannerRef) = createRefs()
+
+                    graphic(
+                        Modifier
+                            .constrainAs(graphicRef) {
+                                centerTo(parent)
+                            }
+                    )
+
+                    if (showNotificationsBanner) {
+                        Box(modifier = Modifier.constrainAs(notificationsBannerRef) {
+                            bottom.linkTo(graphicRef.bottom)
+                            centerHorizontallyTo(parent)
+                        }) {
+                            notificationsBanner()
+                        }
+                    }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp, 48.dp, 16.dp, 16.dp)
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        title()
+                        subTitle()
+                    }
+                    Column(
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        progress()
+                    }
                 }
             }
         }
-
-        Box {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .wrapContentSize(Alignment.TopStart)
-                    .widthIn(max = CONTENT_WIDTH)
-                    .align(Alignment.Center)
-                    .fillMaxWidth()
-            ) {
-                progress()
-            }
-        }
-    }
+    )
 }
 
 @Composable
@@ -378,13 +444,14 @@ fun JobInProgressView(
                 textAlign = TextAlign.Center
             )
         },
-        graphic = {
+        graphic = { modifier ->
             var clickLastTime by remember { mutableStateOf(0L) }
             var clickCount by remember { mutableStateOf(0) }
             var easterEgg by remember { mutableStateOf(false) }
 
             Column(modifier = Modifier
                 .fillMaxWidth()
+                .clipToBounds()
                 .clickable {
                     val now = System.currentTimeMillis()
                     if (now - clickLastTime < 500) {
@@ -402,7 +469,9 @@ fun JobInProgressView(
                         clickCount = 0
                     }
                     clickLastTime = now
-                }) {
+                }
+                .then(modifier)
+            ) {
                 if (easterEgg) {
                     GifImage(
                         modifier = Modifier
