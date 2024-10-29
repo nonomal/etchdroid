@@ -908,32 +908,79 @@ fun FatalErrorViewLayout(
     icon: @Composable () -> Unit,
     buttons: @Composable FlowRowScope.() -> Unit,
 ) {
-    ConstraintLayout(modifier = modifier) {
-        val stuffBoxRef = createRef()
-
-        Column(
-            modifier = Modifier
-                .constrainAs(stuffBoxRef) {
-                    centerTo(parent)
-                }
-                .padding(32.dp),
-            verticalArrangement = Arrangement.spacedBy(32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            val context = LocalContext.current
-            title()
-            message()
-            suggestion()
-            icon()
-
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+    ScreenSizeLayoutSelector(
+        modifier = modifier,
+        normal = {
+            Box(
+                modifier = Modifier
+                    .wrapContentSize(Alignment.TopStart)
+                    .widthIn(max = CONTENT_WIDTH)
+                    .align(Alignment.Center)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                contentAlignment = Alignment.Center
             ) {
-                buttons()
+                Column(
+                    modifier = Modifier.padding(32.dp),
+                    verticalArrangement = Arrangement.spacedBy(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    title()
+                    message()
+                    suggestion()
+                    icon()
+
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(
+                            8.dp,
+                            Alignment.CenterHorizontally
+                        )
+                    ) {
+                        buttons()
+                    }
+                }
             }
-        }
-    }
+        },
+        compact = {
+            Row(
+                modifier = modifier
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.4f)
+                        .fillMaxHeight(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    icon()
+                }
+
+                Column(
+                    modifier = Modifier
+                        .padding(32.dp)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    title()
+                    message()
+                    suggestion()
+
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(
+                            8.dp,
+                            Alignment.CenterHorizontally
+                        )
+                    ) {
+                        buttons()
+                    }
+                }
+            }
+        })
 }
 
 @OptIn(ExperimentalLayoutApi::class)
