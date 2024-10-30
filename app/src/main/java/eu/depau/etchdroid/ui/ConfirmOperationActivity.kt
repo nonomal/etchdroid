@@ -63,6 +63,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontStyle
@@ -70,6 +71,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ChainStyle
@@ -416,10 +418,14 @@ fun ConfirmationViewLayout(
 
                 ConstraintLayout(Modifier.fillMaxWidth()) {
                     val (sourceCardRef, arrowRef, destinationCardRef) = createRefs()
-                    val chain = createHorizontalChain(
-                        sourceCardRef, arrowRef, destinationCardRef,
-                        chainStyle = ChainStyle.Packed
-                    )
+                    val chain =
+                        if (LocalLayoutDirection.current == LayoutDirection.Ltr) createHorizontalChain(
+                            sourceCardRef, arrowRef, destinationCardRef,
+                            chainStyle = ChainStyle.Packed
+                        ) else createHorizontalChain(
+                            destinationCardRef, arrowRef, sourceCardRef,
+                            chainStyle = ChainStyle.Packed
+                        )
                     constrain(chain) {
                         start.linkTo(parent.start, 16.dp)
                         end.linkTo(parent.end, 16.dp)
