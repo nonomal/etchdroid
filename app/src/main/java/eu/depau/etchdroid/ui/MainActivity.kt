@@ -58,6 +58,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -75,9 +79,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
@@ -257,7 +259,16 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            MainView(mViewModel) {
+            val snackbarHostState = remember { SnackbarHostState() }
+            var telemetryDialogOpen by remember { mutableStateOf(false) }
+
+            fun setTelemetry(enabled: Boolean) {
+                Telemetry.enabled = enabled
+                mViewModel.setTelemetry(enabled)
+            }
+
+
+            MainView(mViewModel, snackbarHost = { SnackbarHost(snackbarHostState) }) {
                 StartView(
                     mViewModel,
                     setThemeMode = { mSettings.themeMode = it },
@@ -273,9 +284,12 @@ class MainActivity : ComponentActivity() {
                     openAboutView = {
                         startActivity(Intent(this, AboutActivity::class.java))
                     },
-                    setTelemetry = { enabled ->
-                        Telemetry.enabled = enabled
-                        mViewModel.setTelemetry(enabled)
+                    toggleTelemetry = {
+                        if (Telemetry.enabled) {
+                            telemetryDialogOpen = true
+                        } else {
+                            setTelemetry(true)
+                        }
                     }
                 )
                 val uiState by mViewModel.state.collectAsState()
@@ -307,6 +321,29 @@ class MainActivity : ComponentActivity() {
                         },
                         availableDevices = { uiState.massStorageDevices }
                     )
+                }
+
+                if (telemetryDialogOpen) {
+                    TelemetryAlertDialog(
+                        onDismissRequest = { telemetryDialogOpen = false },
+                        onOptOut = { setTelemetry(false) },
+                        onCancel = { setTelemetry(true) }
+                    )
+                }
+
+                if (!Telemetry.isStub && mSettings.showTelemetryBanner) {
+                    mSettings.showTelemetryBanner = false
+                    LaunchedEffect(null) {
+                        val result = snackbarHostState.showSnackbar(
+                            getString(R.string.etchdroid_uses_telemetry),
+                            actionLabel = getString(R.string.learn_more),
+                            withDismissAction = true,
+                            duration = SnackbarDuration.Short,
+                        )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            telemetryDialogOpen = true
+                        }
+                    }
                 }
             }
         }
@@ -440,12 +477,11 @@ fun StartView(
     setDynamicTheme: (Boolean) -> Unit = {},
     onCTAClick: () -> Unit = {},
     openAboutView: () -> Unit = {},
-    setTelemetry: (Boolean) -> Unit = {},
+    toggleTelemetry: () -> Unit = {},
 ) {
     val uiState by viewModel.state.collectAsState()
     var menuOpen by remember { mutableStateOf(false) }
     var whatCanIWriteOpen by remember { mutableStateOf(false) }
-    var telemetryDialogOpen by remember { mutableStateOf(false) }
 
     val iconBackgroundColor = MaterialTheme.colorScheme.onSurfaceVariant
     val systemInDarkMode = isSystemInDarkTheme()
@@ -575,15 +611,6 @@ fun StartView(
                         modifier = Modifier.padding(12.dp, 0.dp)
                     )
 
-                    fun toggleTelemetry() {
-                        val checked = uiState.telemetry
-                        if (checked) {
-                            telemetryDialogOpen = true
-                        } else {
-                            setTelemetry(true)
-                        }
-                    }
-
                     DropdownMenuItem(
                         onClick = { toggleTelemetry() },
                         text = { Text("Send anonymous data") },
@@ -632,13 +659,6 @@ fun StartView(
                 onDismissRequest = {
                     whatCanIWriteOpen = false
                 }, darkTheme = darkMode
-            )
-        }
-        if (telemetryDialogOpen) {
-            TelemetryAlertDialog(
-                onDismissRequest = { telemetryDialogOpen = false },
-                onOptOut = { setTelemetry(false) },
-                onCancel = { setTelemetry(true) }
             )
         }
     }

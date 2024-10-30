@@ -257,4 +257,10 @@
     <string name="telemetry_opt_out">Opt-out</string>
     <!-- Button to opt-in to telemetry; it can be translated as "Enable telemetry" if it fits better in the target language -->
     <string name="telemetry_keep_enabled">Keep enabled</string>
+
+    <!-- Displayed in the main app screen on first launch in a toast/snackbar. It should be short and concise. -->
+    <string name="etchdroid_uses_telemetry">EtchDroid sends telemetry info.</string>
+
+    <!-- Displayed in the main app screen on first launch as a snackbar action button. It should be short and concise. -->
+    <string name="learn_more">Learn more</string>
 </resources>

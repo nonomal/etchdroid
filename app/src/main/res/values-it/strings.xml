@@ -132,4 +132,6 @@
     <string name="telemetry_icon">Icona per la telemetria</string>
     <string name="telemetry_opt_out">Disattiva telemetria</string>
     <string name="telemetry_keep_enabled">Mantieni attiva</string>
+    <string name="etchdroid_uses_telemetry">EtchDroid invia della telemetria.</string>
+    <string name="learn_more">Maggiori info</string>
 </resources>
