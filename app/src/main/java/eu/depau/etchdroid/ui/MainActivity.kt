@@ -613,7 +613,7 @@ fun StartView(
 
                     DropdownMenuItem(
                         onClick = { toggleTelemetry() },
-                        text = { Text("Send anonymous data") },
+                        text = { Text(stringResource(R.string.send_anonymous_data)) },
                         leadingIcon = {
                             Checkbox(modifier = Modifier.size(20.dp),
                                 checked = Telemetry.enabled,

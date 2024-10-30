@@ -134,4 +134,5 @@
     <string name="telemetry_keep_enabled">Mantieni attiva</string>
     <string name="etchdroid_uses_telemetry">EtchDroid invia della telemetria.</string>
     <string name="learn_more">Maggiori info</string>
+    <string name="send_anonymous_data">Invia dati anonimi</string>
 </resources>
