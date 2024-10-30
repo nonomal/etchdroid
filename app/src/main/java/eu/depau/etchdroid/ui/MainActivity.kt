@@ -702,7 +702,7 @@ fun TelemetryAlertDialog(
     onOptOut: () -> Unit,
     onCancel: () -> Unit = {},
 ) = AlertDialog(onDismissRequest = onDismissRequest, title = {
-    Text(text = stringResource(R.string.we_need_your_help))
+    Text(text = stringResource(R.string.we_need_your_help), textAlign = TextAlign.Center)
 }, text = {
     val scrollState = rememberScrollState()
     val privacyPolicy = stringResource(R.string.privacy_policy)
