@@ -120,7 +120,9 @@ fun AboutViewLayout(
                     logo()
                 }
 
-                contributorsInfo()
+                Box(Modifier.padding(horizontal = 16.dp)) {
+                    contributorsInfo()
+                }
 
                 FlowRow(
                     modifier = Modifier
