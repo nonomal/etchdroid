@@ -7,9 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -26,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
@@ -118,7 +117,7 @@ import eu.depau.etchdroid.utils.ktexts.usbDevice
 private const val TAG = "MainActivity"
 
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ActivityBase() {
     private val mViewModel: MainActivityViewModel by viewModels()
     private lateinit var mSettings: AppSettings
 
@@ -241,8 +240,6 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        enableEdgeToEdge()
 
         mViewModel.apply {
             setTelemetry(Telemetry.enabled)
@@ -497,7 +494,9 @@ fun StartView(
     val menuScrollState = rememberScrollState()
 
     StartViewLayout(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .safeDrawingPadding()
+            .fillMaxSize(),
         title = {
             Text(
                 text = "EtchDroid",

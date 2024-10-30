@@ -2,7 +2,6 @@ package eu.depau.etchdroid.ui.composables
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -31,11 +30,8 @@ fun MainView(
             color = MaterialTheme.colorScheme.background,
         ) {
             Scaffold(snackbarHost = snackbarHost) { contentPadding ->
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(contentPadding)
-                ) {
+                contentPadding // silence unused warning
+                Box(Modifier.fillMaxSize()) {
                     content()
                 }
             }

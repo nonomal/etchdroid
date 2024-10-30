@@ -4,9 +4,7 @@ import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
@@ -57,14 +56,12 @@ import eu.depau.etchdroid.ui.composables.ScreenSizeLayoutSelector
 import eu.depau.etchdroid.ui.composables.coloredShadow
 import eu.depau.etchdroid.utils.ktexts.activity
 
-class AboutActivity : ComponentActivity() {
+class AboutActivity : ActivityBase() {
     private val mViewModel: ThemeViewModel by viewModels()
     private lateinit var mSettings: AppSettings
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        enableEdgeToEdge()
 
         mSettings = AppSettings(this).apply {
             addListener(mViewModel)
@@ -98,6 +95,8 @@ fun AboutViewLayout(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .fillMaxWidth()
+                    .safeDrawingPadding()
+                    .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(48.dp)
@@ -120,9 +119,7 @@ fun AboutViewLayout(
                     logo()
                 }
 
-                Box(Modifier.padding(horizontal = 16.dp)) {
-                    contributorsInfo()
-                }
+                contributorsInfo()
 
                 FlowRow(
                     modifier = Modifier
@@ -142,6 +139,7 @@ fun AboutViewLayout(
                 Modifier
                     .sizeIn(minWidth = 550.dp)
                     .fillMaxSize()
+                    .safeDrawingPadding()
                     .horizontalScroll(rememberScrollState())
             ) {
                 Row(

@@ -1,6 +1,7 @@
 package eu.depau.etchdroid.ui.theme
 
 import android.app.Activity
+import android.graphics.Color
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
@@ -104,8 +105,8 @@ fun EtchDroidTheme(
             ?: throw Exception("Not in an activity - unable to get Window reference")
         SideEffect {
             currentWindow.apply {
-                statusBarColor = colorScheme.surface.toArgb()
-                navigationBarColor = colorScheme.surface.toArgb()
+                statusBarColor = Color.TRANSPARENT
+                navigationBarColor = Color.TRANSPARENT
             }
             WindowCompat.getInsetsController(currentWindow, view).apply {
                 isAppearanceLightStatusBars = !darkTheme

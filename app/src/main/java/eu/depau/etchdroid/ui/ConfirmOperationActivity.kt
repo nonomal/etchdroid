@@ -16,9 +16,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +26,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
@@ -111,7 +110,7 @@ import kotlin.random.Random
 
 private const val TAG = "ConfirmOperationActivit"
 
-class ConfirmOperationActivity : ComponentActivity() {
+class ConfirmOperationActivity : ActivityBase() {
     private val mViewModel: ConfirmOperationActivityViewModel by viewModels()
     private lateinit var mSettings: AppSettings
     private lateinit var mUsbPermissionIntent: PendingIntent
@@ -229,8 +228,6 @@ class ConfirmOperationActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        enableEdgeToEdge()
 
         val openedImage = intent.safeParcelableExtra<Uri>("sourceUri") ?: run {
             Log.e(TAG, "No source image URI provided")
@@ -357,6 +354,7 @@ fun ConfirmationViewLayout(
                     .widthIn(max = CONTENT_WIDTH)
                     .align(Alignment.Center)
                     .fillMaxSize()
+                    .safeDrawingPadding()
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
@@ -414,6 +412,7 @@ fun ConfirmationViewLayout(
                 Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
+                    .safeDrawingPadding()
             ) {
                 Box(
                     Modifier

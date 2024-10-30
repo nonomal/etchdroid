@@ -16,10 +16,8 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.animation.core.AnimationVector1D
@@ -46,6 +44,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
@@ -147,7 +146,7 @@ import me.jahnen.libaums.libusbcommunication.LibusbException
 private const val TAG = "ProgressActivity"
 private const val LAST_NOTIFICATION_TIMEOUT = 11 * 1000L
 
-class ProgressActivity : ComponentActivity() {
+class ProgressActivity : ActivityBase() {
     private lateinit var mSettings: AppSettings
     private val mViewModel: ProgressActivityViewModel by viewModels()
 
@@ -219,8 +218,6 @@ class ProgressActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        enableEdgeToEdge()
 
         println(
             "ProgressActivity running in thread ${Thread.currentThread().name} (${Thread.currentThread().id})"
@@ -309,6 +306,7 @@ fun JobInProgressViewLayout(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .safeDrawingPadding()
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -362,6 +360,7 @@ fun JobInProgressViewLayout(
         compact = {
             Row(
                 modifier = modifier
+                    .safeDrawingPadding()
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -758,6 +757,7 @@ fun SuccessViewLayout(
                     .widthIn(max = CONTENT_WIDTH)
                     .align(Alignment.Center)
                     .fillMaxSize()
+                    .safeDrawingPadding()
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
@@ -802,6 +802,7 @@ fun SuccessViewLayout(
         compact = {
             Row(
                 modifier = modifier
+                    .safeDrawingPadding()
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -986,6 +987,7 @@ fun FatalErrorViewLayout(
                     .widthIn(max = CONTENT_WIDTH)
                     .align(Alignment.Center)
                     .fillMaxSize()
+                    .safeDrawingPadding()
                     .verticalScroll(rememberScrollState()),
                 contentAlignment = Alignment.Center
             ) {
@@ -1014,6 +1016,7 @@ fun FatalErrorViewLayout(
         compact = {
             Row(
                 modifier = modifier
+                    .safeDrawingPadding()
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
