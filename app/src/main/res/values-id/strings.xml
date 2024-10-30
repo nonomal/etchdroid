@@ -10,7 +10,6 @@
     <string name="cancel">Batal</string>
     <string name="unknown_filename">Nama file tidak diketahui</string>
     <string name="notification_verify_progress_title">Memverifikasi image…</string>
-    <string name="notification_verify_no_notifications_text">Aktifkan notifikasi untuk kemajuan - Memverifikasi %1$s terhadap %2$s</string>
     <string name="notification_write_no_notifications_text">Aktifkan pemberitahuan untuk kemajuan - Menulis %1$s ke %2$s</string>
     <string name="notification_write_tap_for_progress_text">Ketuk untuk kemajuan - Menulis %1$s ke %2$s</string>
     <string name="notification_write_progress_content">%1$s ke %2$s</string>
@@ -75,6 +74,5 @@
     <string name="any_other_image_that_works_with_balena_etcher_or_dd">Image lainnya yang dapat digunakan dengan Balena Etcher atau dd</string>
     <string name="older_gnu_linux_distributions_isos_2010">ISO distribusi GNU/Linux yang lebih lama (&lt; 2010)</string>
     <string name="website">Situs web</string>
-    <string name="review">Ulasan</string>
     <string name="support_the_project">Mendukung secara finansial</string>
 </resources>

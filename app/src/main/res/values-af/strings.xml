@@ -47,7 +47,6 @@
     <string name="older_gnu_linux_distributions_isos_2010">Ouer GNU/Linux distribusies se ISOs (&lt;2010)</string>
     <string name="notif_channel_job_result_name">Werksuitkoms</string>
     <string name="notification_write_no_notifications_text">Aktiveer kennisgewings vir vordering • Writing %1$s to %2$s</string>
-    <string name="notification_verify_no_notifications_text">Aktiveer kennisgewings vir vordering • Verifeer tans %1$s na %2$s</string>
     <string name="write_an_image">Skryf \'n beeld</string>
     <string name="whats_supported">Wat word ondersteun?</string>
     <string name="style">Styl</string>

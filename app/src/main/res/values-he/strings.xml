@@ -12,7 +12,6 @@
     <string name="about">על אודות</string>
     <string name="notification_write_progress_title">הדמות נכתבת…</string>
     <string name="notification_verify_progress_title">הדמות מאומתת…</string>
-    <string name="notification_verify_no_notifications_text">הפעלת התראות על התקדמות • %1$s מאומתת אל מול %2$s</string>
     <string name="notification_verify_progress_content">%1$s כנגד %2$s</string>
     <string name="permission_denied_for_usb_device">ההרשאה להתקן ה־USB‏ %1$s נכשלה</string>
     <string name="write_an_image">כתיבת דמות</string>
@@ -102,7 +101,6 @@
 \nבכפוף לרישיון GPLv3 מבית גנו.</string>
     <string name="contributors">מתנדבים</string>
     <string name="website">אתר</string>
-    <string name="review">סקירה</string>
     <string name="verifying_image">התמונה מאומתת</string>
     <string name="got_an_unsupported_drive_notification">קיבלת התראת „כונן עם בעיות”?</string>
     <string name="it_s_safe_to_ignore">אפשר פשוט להתעלם ממנה! צריך רק לנתק את הכונן ולהשתמש בו כרגיל. אפשר %1$s ולראות איך לפרמט את הכונן שלך בהמשך.</string>

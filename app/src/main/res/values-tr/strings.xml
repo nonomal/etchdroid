@@ -21,7 +21,6 @@
     <string name="an_unknown_error_occurred">Bilinmeyen bir hata oluştu: %1$s</string>
     <string name="plug_in_the_same_usb">Daha önce kullandığınız aynı USB aygıtı takın!</string>
     <string name="the_usb_device_content_does_not_match_the_image">USB aygıtının içeriği kalıpla eşleşmiyor</string>
-    <string name="notification_verify_no_notifications_text">İlerleme için bildirimleri etkinleştirin - %1$s, %2$s için doğrulanıyor</string>
     <string name="about">Hakkında</string>
     <string name="notification_write_progress_title">Kalıp yazılıyor…</string>
     <string name="action_required">Eylem gerekli</string>
@@ -78,7 +77,6 @@
 \nGNU GPLv3 lisansı altında lisanslandı.</string>
     <string name="contributors">katkıda bulunanlar</string>
     <string name="website">Web sitesi</string>
-    <string name="review">Değerlendir</string>
     <string name="verifying_image">Kalıp doğrulanıyor</string>
     <string name="writing_image">Kalıp yazılıyor</string>
     <string name="please_avoid_using_your_device">Lütfen aygıtınızı kullanmaktan kaçının</string>

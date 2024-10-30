@@ -42,7 +42,6 @@
     <string name="notif_channel_job_progress_name">تقدم المهمة</string>
     <string name="notif_channel_job_result_desc">تستخدم لإظهار نتيجة عمل مكتملة</string>
     <string name="notification_write_no_notifications_text">تمكين الإخطارات للتقدم • كتابة %1$s إلى %2$s</string>
-    <string name="notification_verify_no_notifications_text">تمكين الإخطارات للتقدم • التحقق من %1$s مقابل %2$s</string>
     <string name="usb_device_was_unplugged">تم فصل جهاز USB</string>
     <string name="write_an_image">اكتب صورة</string>
     <string name="dark">داكن</string>
@@ -88,7 +87,6 @@
 \nمُرخصة بموجب ترخيص GNU GPLv3.</string>
     <string name="contributors">المساهمون</string>
     <string name="website">الموقع اﻹلكتروني</string>
-    <string name="review">المراجعة</string>
     <string name="verifying_image">التحقق من الصورة</string>
     <string name="writing_image">كتابة الصورة</string>
     <string name="no_thanks">لا شكراً</string>

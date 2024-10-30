@@ -56,7 +56,6 @@
     <string name="apple_dmg_disk_images">Apple DMG Festplattenabbilder</string>
     <string name="arch_linux_ubuntu_debian_fedora_pop_os_linux_mint_freebsd_etc">Arch Linux, Ubuntu, Debian, Fedora, pop!_OS, Linux Mint, FreeBSD usw.</string>
     <string name="notification_write_no_notifications_text">Fortschrittsbenachrichtigungen aktivieren • Schreiben von %1$s nach %2$s</string>
-    <string name="notification_verify_no_notifications_text">Fortschrittsbenachrichtigungen aktivieren • Überprüfung von %1$s gegen %2$s</string>
     <string name="notification_write_tap_for_progress_text">Für Fortschritt tippen • Schreiben von %1$s zu %2$s</string>
     <string name="a_regular_windows_iso_won_t_work">Ein normales Windows-ISO funktioniert nicht mit EtchDroid, es sei denn, es wurde speziell für die Verwendung mit Etcher, dd oder EtchDroid vorbereitet.</string>
     <string name="writing_the_image_will_erase">Schreiben des Datenträgerabbilds wird alle Daten auf dem ausgewählten Datenträger löschen</string>
@@ -108,7 +107,6 @@
     <string name="how_did_this_happen">Wie ist das passiert?</string>
     <string name="write_another_image">Ein weiteres Datenträgerabbild schreiben</string>
     <string name="support_the_project">Finanziell unterstützen</string>
-    <string name="review">Bewerten</string>
     <string name="perhaps_your_usb_port_is_dirty">Vielleicht ist Ihr USB-Anschluss verschmutzt, Ihr Adapter ist defekt oder Ihr Gerät kann nicht genügend Strom liefern. Erwägen Sie, einen anderen Adapter oder ein anderes Gerät auszuprobieren.</string>
     <string name="usb_drives_are_unreliable">USB-Laufwerke sind unzuverlässig und Android gewährt nicht genügend Berechtigungen für eine automatische Wiederherstellung. Wir müssen mit dem auskommen, was wir haben!</string>
     <string name="verifying">Verifiziert</string>

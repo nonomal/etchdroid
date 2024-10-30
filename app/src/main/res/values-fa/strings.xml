@@ -15,7 +15,6 @@
     <string name="notif_channel_job_progress_name">پیشرفت کار</string>
     <string name="notification_write_progress_title">تصویر در حال نوشتن است…</string>
     <string name="notification_verify_progress_title">تصویر در حال پذیرش است…</string>
-    <string name="notification_verify_no_notifications_text">آگاه‌ساز‌ها را برای مشاهده پیشرفت فعال کنید • پذیرش %1$s در مقابل %2$s</string>
     <string name="write_finished">نوشتن پایان یافت</string>
     <string name="success_notif_content_text">%1$s به درستی به %2$s نوشته شد</string>
     <string name="write_failed">نادرستی در نوشتن</string>
@@ -83,7 +82,6 @@
     <string name="raspberry_pi_sd_card_images_unzip_first">تصاویر کارت SD Raspberry Pi (اول آن‌ها را باز کنید!)</string>
     <string name="developed_by">گسنرش یافته به دست %1$s و دیگر %2$s.\nکد خاستگاه در دسترس است %3$s.\nبا پروانه GNU GPLv3.</string>
     <string name="contributors">همکاران</string>
-    <string name="review">بررسی</string>
     <string name="any_other_image_that_works_with_balena_etcher_or_dd">هر تصویر دیگری که با Balena Etcher یا dd کار می‌کند</string>
     <string name="older_gnu_linux_distributions_isos_2010">تصاویر ISO توزیع‌های دیرین GNU/Linux (&lt; 2010)</string>
     <string name="support_for_dmg_images_was_removed">پشتیبانی از تصاویر DMG در EtchDroid 2.0 حذف شد. نگارشهای کهنه‌تر را می‌توانید از %1$s دریافت کنید.</string>

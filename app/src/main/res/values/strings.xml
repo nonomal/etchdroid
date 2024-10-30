@@ -26,8 +26,6 @@
     <string name="notification_verify_progress_title">Verifying image…</string>
     <!--  Notification content for long-running job status, used when the user has not granted the notification permission. The first parameter will be replaced with the source file name, the second one with the USB stick name -->
     <string name="notification_write_no_notifications_text">Enable notifications for progress • Writing %1$s to %2$s</string>
-    <!--  Notification content for long-running job status, used when the user has not granted the notification permission. The first parameter will be replaced with the device name, the second one with the image file name -->
-    <string name="notification_verify_no_notifications_text">Enable notifications for progress • Verifying %1$s against %2$s</string>
     <!--  Notification content for long-running job status, used when the user has granted the notification permission but no progress info is available. The first parameter will be replaced with the source file name, the second one with the USB stick name -->
     <string name="notification_write_tap_for_progress_text">Tap for progress • Writing %1$s to %2$s</string>
     <!--  Notification content: "{file name} to {device name}", used when the user has granted the notification permission; The notification title will be: "Writing image…" and this string will show up right below it. -->
@@ -146,8 +144,6 @@
     <string name="website">Website</string>
     <!-- Displayed in the about page links; keep it short! -->
     <string name="support_the_project">Support financially</string>
-    <!-- "Review" as in "Write a review". Displayed in the about page links; keep it very short! -->
-    <string name="review">Review</string>
     <!-- Title of the progress page while an image is being verified -->
     <string name="verifying_image">Verifying image</string>
     <!-- Title of the progress page while an image is being written -->

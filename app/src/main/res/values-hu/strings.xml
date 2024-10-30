@@ -71,7 +71,6 @@
     <string name="supported">Támogatott</string>
     <string name="website">Weboldal</string>
     <string name="support_the_project">Támogatás</string>
-    <string name="review">Értékelés</string>
     <string name="verifying_image">Lemezkép ellenőrzése</string>
     <string name="writing_image">Lemezkép írása</string>
     <string name="please_avoid_using_your_device">Kérjük ne használja az eszközt</string>
@@ -90,7 +89,6 @@
     <string name="error">Hiba</string>
     <string name="start_over">Újrakezdés</string>
     <string name="notification_write_no_notifications_text">Értesítések engedélyezése a folyamathoz • Lemezkép %1$s írása erre %2$s</string>
-    <string name="notification_verify_no_notifications_text">Értesítések engedélyezése a folyamathoz • Lemezkép %1$s ellenőrzése ezzel%2$s</string>
     <string name="notif_channel_job_progress_desc" comment="Notification channel description">Aktuális munkamenet előrehaladásának megjelenítése</string>
     <string name="notif_channel_job_result_desc">Munkamenet eredményének megjelenítése</string>
     <string name="notification_write_tap_for_progress_text">Koppintson a folyamat megtekintéséhez • Lemezkép %1$s írása erre %2$s</string>

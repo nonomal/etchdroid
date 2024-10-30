@@ -9,7 +9,6 @@
     <string name="notif_channel_job_result_name">İşin nəticəsi</string>
     <string name="notification_write_progress_title">İmaj yazılır…</string>
     <string name="notification_verify_progress_title">İmaj təsdiqlənir…</string>
-    <string name="notification_verify_no_notifications_text">Prosses üçün bildirişləri aktivləşdirin • %1$s %2$s-a qarşı doğrulanır</string>
     <string name="notification_write_tap_for_progress_text">Prosses üçün toxunun • %1$s - %2$s yazın</string>
     <string name="unknown_filename">Naməlum fayl adı</string>
     <string name="permission_denied_for_usb_device">USB cihazı üçün icazə rədd edildi %1$s</string>
@@ -102,7 +101,6 @@
     <string name="developed_by">%1$s və digər %2$s tərəfindən hazırlanmışdır.
 \nMənbə kodu %3$s-də mövcuddur.
 \nGNU GPLv3 lisenziyası ilə lisenziyalaşdırılıb.</string>
-    <string name="review">Gözdən keçirmə</string>
     <string name="support_for_dmg_images_was_removed">DMG imajları üçün dəstək EtchDroid 2.0-da silindi. Köhnə versiyaları %1$s-dən yükləmək olar.</string>
     <string name="would_you_like_to_be_notified">Bitirdikdə xəbərdar olmaq istərdinizmi\? Yalnız prosses yeniləmələri, spam və ya reklam yoxdur.</string>
     <string name="support_the_project">Maddi dəstək</string>

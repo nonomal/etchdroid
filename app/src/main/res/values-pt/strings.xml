@@ -22,7 +22,6 @@
     <string name="notification_write_progress_title">A Escrever imagem…</string>
     <string name="notification_verify_progress_title">A verificar imagem…</string>
     <string name="notification_write_no_notifications_text">Ative notificações de progresso • A gravar %1$s em %2$s</string>
-    <string name="notification_verify_no_notifications_text">Ative notificações de progresso • A verificar %1$s contra %2$s</string>
     <string name="notification_write_tap_for_progress_text">Toque para ver o progresso • Escrevendo %1$s em %2$s</string>
     <string name="notification_write_progress_content">%1$s em %2$s</string>
     <string name="notification_verify_progress_content">%1$s contra %2$s</string>
@@ -78,7 +77,6 @@
 \nLicenciado sob a licença GNU GPLv3.</string>
     <string name="contributors">colaboradores</string>
     <string name="website">Website</string>
-    <string name="review">Análise</string>
     <string name="verifying_image">A verificar imagem</string>
     <string name="writing_image">A escrever imagem</string>
     <string name="please_avoid_using_your_device">Por favor, evite utilizar seu dispositivo</string>

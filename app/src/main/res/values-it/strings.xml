@@ -52,7 +52,6 @@
     <string name="older_gnu_linux_distributions_isos_2010">ISO di distribuzioni GNU/Linux vecchie (&lt; 2010)</string>
     <string name="contributors">volontariз</string>
     <string name="website">Sito web</string>
-    <string name="review">Recensisci</string>
     <string name="verifying_image">Verifica immagine</string>
     <string name="writing_image">Scrittura immagine</string>
     <string name="please_avoid_using_your_device">Evita di usare il dispositivo</string>
@@ -93,7 +92,6 @@
     <string name="notification_verify_progress_title">Verifica immagine…</string>
     <string name="style">Tema</string>
     <string name="notification_write_no_notifications_text">Attiva le notifiche per l\'avanzamento • Scrittura di %1$s su %2$s</string>
-    <string name="notification_verify_no_notifications_text">Attiva le notifiche per l\'avanzamento • Verifica di %1$s rispetto a %2$s</string>
     <string name="write_an_image">Scrivi un\'immagine</string>
     <string name="notification_write_progress_content">%1$s su %2$s</string>
     <string name="disk_images">Immagini disco</string>

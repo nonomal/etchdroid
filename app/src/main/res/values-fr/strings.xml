@@ -84,7 +84,6 @@
     <string name="lay_your_device_flat_no_accel">Posez votre appareil à plat sur une table avant de continuer.</string>
     <string name="lay_your_device_flat">Posez votre appareil à plat sur une table et ne le touchez pas</string>
     <string name="notification_write_no_notifications_text">Activer les notifications de progression - Écriture de %1$s à %2$s</string>
-    <string name="notification_verify_no_notifications_text">Activer les notifications de progression - Vérification de %1$s par rapport à %2$s</string>
     <string name="notification_write_progress_content">%1$s à %2$s</string>
     <string name="is_this_a_windows_iso">S\'agit-il d\'une ISO Windows ?</string>
     <string name="continue_anyway">Continuer de toute façon</string>
@@ -103,7 +102,6 @@
     <string name="no_destination_device_selected">Aucun dispositif de destination n\'a été sélectionné</string>
     <string name="support_for_dmg_images_was_removed">La prise en charge des images DMG a été supprimée dans EtchDroid 2.0. Les anciennes versions peuvent être téléchargées à partir de %1$s.</string>
     <string name="developed_by">Développé par %1$s et d\'autres %2$s.\nLe code source est disponible sur %3$s.\nLicence GNU GPLv3.</string>
-    <string name="review">Révision</string>
     <string name="copying">Copie</string>
     <string name="please_avoid_using_your_device">Evitez d\'utiliser votre appareil</string>
     <string name="against">contre</string>

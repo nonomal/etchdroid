@@ -9,7 +9,6 @@
     <string name="cancel">Hủy</string>
     <string name="success_notif_content_text">%1$s đã được ghi vào %2$s</string>
     <string name="notif_channel_job_progress_name">Trạng thái tác vụ</string>
-    <string name="notification_verify_no_notifications_text">Bật thông báo tiến độ • Xác minh %1$s với %2$s</string>
     <string name="unknown_filename">Tên file không xác định</string>
     <string name="dark">Tối</string>
     <string name="is_this_a_windows_iso">Đây có phải là file ISO Windows không?</string>
@@ -93,7 +92,6 @@
 \nPhân phối dưới bản quyền GNU GPLv3.</string>
     <string name="contributors">những người đóng góp khác</string>
     <string name="website">Website</string>
-    <string name="review">Đánh giá</string>
     <string name="verifying_image">Đang xác minh file ảnh</string>
     <string name="please_avoid_using_your_device">Vui lòng hạn chế sử dụng thiết bị</string>
     <string name="would_you_like_to_be_notified">Bạn có muốn nhận thông báo khi hoàn tất không? Chỉ có thông báo tiến độ, không có spam hoặc quảng cáo.</string>

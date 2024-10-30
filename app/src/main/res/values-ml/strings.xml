@@ -7,7 +7,6 @@
     <string name="write_failed">എഴുത്ത് പരാജയപ്പെട്ടു</string>
     <string name="notif_channel_job_result_desc">പൂർത്തിയാക്കിയ ജോലിയുടെ ഫലം കാണിക്കാൻ ഉപയോഗിക്കുന്നു</string>
     <string name="notif_channel_job_result_name">ജോലിയുടെ ഫലം</string>
-    <string name="notification_verify_no_notifications_text">പുരോഗതിക്കായി അറിയിപ്പുകൾ പ്രവർത്തനക്ഷമമാക്കുക • %2$s എന്നതിനെതിരെ %1$s പരിശോധിക്കുന്നു</string>
     <string name="notification_verify_progress_content">%2$s എന്നതിനെതിരെ %1$s</string>
     <string name="permission_denied_for_usb_device">%1$s എന്ന യുഎസ്ബി ഉപകരണത്തിന് അനുമതി നിരസിച്ചു</string>
     <string name="whats_supported">എന്താണ് പിന്തുണയ്ക്കുന്നത്\?</string>
@@ -59,7 +58,6 @@
     <string name="please_avoid_using_your_device">നിങ്ങളുടെ ഉപകരണം ഉപയോഗിക്കുന്നത് ഒഴിവാക്കുക</string>
     <string name="verifying">സ്ഥിരീകരിക്കുന്നു</string>
     <string name="no_thanks">വേണ്ട, നന്ദി</string>
-    <string name="review">അവലോകനം</string>
     <string name="action_required">നടപടി ആവശ്യമാണ്</string>
     <string name="notification_write_no_notifications_text">പുരോഗതിക്കായി അറിയിപ്പുകൾ പ്രവർത്തനക്ഷമമാക്കുക • %1$s മുതൽ %2$s വരെ എഴുതുന്നു</string>
     <string name="notif_channel_job_progress_desc" comment="Notification channel description">നിലവിലെ ജോലിയുടെ പുരോഗതി കാണിക്കാൻ ഉപയോഗിക്കുന്നു</string>

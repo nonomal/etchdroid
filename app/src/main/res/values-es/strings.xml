@@ -35,7 +35,6 @@
     <string name="perhaps_your_usb_port_is_dirty">Quizás el puerto USB esté sucio, el adaptador esté defectuoso o el dispositivo no pueda proporcionar suficiente energía. Considera probar con otro adaptador o dispositivo.</string>
     <string name="an_unknown_error_occurred">Se produjo un error desconocido: %1$s</string>
     <string name="notification_write_no_notifications_text">Activar notificaciones de progreso - Escribiendo %1$s a %2$s</string>
-    <string name="notification_verify_no_notifications_text">Activar notificaciones para el progreso • Verificando %1$s contra %2$s</string>
     <string name="notification_write_tap_for_progress_text">Tocar para avanzar • Escribiendo %1$s a %2$s</string>
     <string name="permission_denied_for_usb_device">Permiso denegado para el dispositivo USB %1$s</string>
     <string name="usb_device_was_unplugged">Se ha retirado el dispositivo USB</string>
@@ -84,7 +83,6 @@
 \nBajo la licencia GNU GPLv3.</string>
     <string name="contributors">Colaboradores</string>
     <string name="website">Página web</string>
-    <string name="review">Reseña</string>
     <string name="verifying_image">Verificando la imagen</string>
     <string name="writing_image">Escribiendo la imagen</string>
     <string name="no_thanks">No, gracias</string>
