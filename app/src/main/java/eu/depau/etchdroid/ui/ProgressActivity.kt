@@ -1089,9 +1089,7 @@ fun FatalErrorView(
         },
         icon = {
             Icon(
-                modifier = Modifier
-                    .size(256.dp)
-                    .rtlMirror(),
+                modifier = Modifier.size(256.dp),
                 imageVector = ImageVector.vectorResource(
                     id = R.drawable.ic_write_to_usb_failed_large
                 ),
