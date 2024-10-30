@@ -670,7 +670,7 @@ fun WindowsImageAlertDialog(
     onConfirm: () -> Unit,
     onCancel: () -> Unit = {},
 ) = AlertDialog(onDismissRequest = onDismissRequest, title = {
-    Text(text = stringResource(R.string.is_this_a_windows_iso))
+    Text(text = stringResource(R.string.is_this_a_windows_iso), textAlign = TextAlign.Center)
 }, text = {
     Text(
         text = stringResource(R.string.a_regular_windows_iso_won_t_work)
