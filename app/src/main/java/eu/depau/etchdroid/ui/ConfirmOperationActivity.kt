@@ -415,6 +415,14 @@ fun ConfirmationViewLayout(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
+                Box(
+                    Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    title()
+                }
 
                 ConstraintLayout(Modifier.fillMaxWidth()) {
                     val (sourceCardRef, arrowRef, destinationCardRef) = createRefs()
