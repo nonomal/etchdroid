@@ -22,9 +22,11 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import eu.depau.etchdroid.R
 import eu.depau.etchdroid.utils.exception.base.RecoverableException
@@ -65,8 +67,10 @@ fun ReconnectUsbDriveDialog(exception: RecoverableException) {
                     textAlign = TextAlign.Companion.Center,
                     style = MaterialTheme.typography.bodyMedium
                 )
-                val vectorRes =
+                val vectorRes = if (LocalLayoutDirection.current == LayoutDirection.Ltr)
                     ImageVector.Companion.vectorResource(R.drawable.unplug_reconnect_accept)
+                else
+                    ImageVector.Companion.vectorResource(R.drawable.unplug_reconnect_accept_rtl)
                 Image(
                     imageVector = vectorRes,
                     contentDescription = stringResource(

@@ -79,6 +79,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.LinkAnnotation
@@ -91,6 +92,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -121,6 +123,7 @@ import eu.depau.etchdroid.ui.composables.MainView
 import eu.depau.etchdroid.ui.composables.ReconnectUsbDriveDialog
 import eu.depau.etchdroid.ui.composables.RecoverableExceptionExplanationCard
 import eu.depau.etchdroid.ui.composables.ScreenSizeLayoutSelector
+import eu.depau.etchdroid.ui.utils.rtlMirror
 import eu.depau.etchdroid.utils.broadcastReceiver
 import eu.depau.etchdroid.utils.exception.InitException
 import eu.depau.etchdroid.utils.exception.MissingPermissionException
@@ -483,112 +486,117 @@ fun JobInProgressView(
                         gifRes = if (uiState.isVerifying) R.drawable.win_xp_verify else R.drawable.win_xp_copy
                     )
                 } else {
-                    ConstraintLayout(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(256.dp)
-                    ) {
-                        val (usbDrive, imagesRow, magnifyingGlass) = createRefs()
-
-                        val numberOfImages = 3
-                        val imageWidth = 64
-                        val density = LocalDensity.current
-                        var rowSize by remember { mutableStateOf(IntSize.Zero) }
-                        val repeatWidth by remember(rowSize) {
-                            derivedStateOf {
-                                val dpWidth = with(density) { rowSize.width.toDp() }.value
-                                (dpWidth - (imageWidth * numberOfImages)) / (numberOfImages - 1) + imageWidth
-                            }
-                        }
-
-                        val anchorTransition =
-                            rememberInfiniteTransition(label = "anchorTransition")
-                        val anchor by anchorTransition.animateValue(
-                            initialValue = if (uiState.isVerifying) 100.dp else (100 + repeatWidth).dp,
-                            targetValue = if (uiState.isVerifying) (100 + repeatWidth).dp else 100.dp,
-                            typeConverter = TwoWayConverter(convertToVector = {
-                                AnimationVector1D(
-                                    it.value
-                                )
-                            },
-                                convertFromVector = { it.value.dp }),
-                            animationSpec = infiniteRepeatable(
-                                animation = tween(2000, easing = LinearEasing),
-                                repeatMode = RepeatMode.Restart
-                            ),
-                            label = "anchor"
-                        )
-
-                        Row(modifier = Modifier
-                            .constrainAs(imagesRow) {
-                                centerVerticallyTo(usbDrive)
-                                if (uiState.isVerifying) {
-                                    start.linkTo(usbDrive.start, anchor)
-                                } else {
-                                    end.linkTo(usbDrive.end, anchor)
-                                }
-                            }
-                            .padding(bottom = 32.dp)
-                            .fillMaxWidth()
-                            .onSizeChanged {
-                                rowSize = it
-                            }, horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            for (i in 0 until numberOfImages) Icon(
-                                imageVector = ImageVector.vectorResource(
-                                    id = R.drawable.ic_disk_image_large
-                                ),
-                                modifier = Modifier.size(imageWidth.dp),
-                                contentDescription = "",
-                            )
-                        }
-
-                        val bgColor = MaterialTheme.colorScheme.background
-                        Icon(
-                            imageVector = ImageVector.vectorResource(
-                                id = R.drawable.ic_usb_stick_large
-                            ),
+                    Box(Modifier.rtlMirror()) {
+                        ConstraintLayout(
                             modifier = Modifier
-                                .constrainAs(usbDrive) {
-                                    centerTo(parent)
-                                }
-                                .padding(
-                                    if (uiState.isVerifying) PaddingValues(
-                                        end = 128.dp
-                                    ) else PaddingValues(start = 128.dp)
-                                )
-                                .drawBehind {
-                                    drawRect(bgColor,
-                                        topLeft = with(density) {
-                                            Offset(
-                                                88.dp.toPx(),
-                                                22.dp.toPx()
-                                            )
-                                        },
-                                        size = with(density) {
-                                            DpSize(
-                                                80.dp,
-                                                180.dp
-                                            ).toSize()
-                                        })
-                                }
-                                .size(256.dp),
-                            contentDescription = "",
-                        )
+                                .fillMaxWidth()
+                                .height(256.dp)
+                        ) {
+                            val (usbDrive, imagesRow, magnifyingGlass) = createRefs()
 
-                        if (uiState.isVerifying) {
+                            val numberOfImages = 3
+                            val imageWidth = 64
+                            val density = LocalDensity.current
+                            var rowSize by remember { mutableStateOf(IntSize.Zero) }
+                            val repeatWidth by remember(rowSize) {
+                                derivedStateOf {
+                                    val dpWidth = with(density) { rowSize.width.toDp() }.value
+                                    (dpWidth - (imageWidth * numberOfImages)) / (numberOfImages - 1) + imageWidth
+                                }
+                            }
+
+                            val anchorTransition =
+                                rememberInfiniteTransition(label = "anchorTransition")
+                            val anchor by anchorTransition.animateValue(
+                                initialValue = if (uiState.isVerifying) 100.dp else (100 + repeatWidth).dp,
+                                targetValue = if (uiState.isVerifying) (100 + repeatWidth).dp else 100.dp,
+                                typeConverter = TwoWayConverter(convertToVector = {
+                                    AnimationVector1D(
+                                        it.value
+                                    )
+                                },
+                                    convertFromVector = { it.value.dp }),
+                                animationSpec = infiniteRepeatable(
+                                    animation = tween(2000, easing = LinearEasing),
+                                    repeatMode = RepeatMode.Restart
+                                ),
+                                label = "anchor"
+                            )
+
+                            Row(modifier = Modifier
+                                .constrainAs(imagesRow) {
+                                    centerVerticallyTo(usbDrive)
+                                    if (uiState.isVerifying) {
+                                        absoluteLeft.linkTo(usbDrive.absoluteLeft, anchor)
+                                    } else {
+                                        absoluteRight.linkTo(usbDrive.absoluteRight, anchor)
+                                    }
+                                }
+                                .padding(bottom = 32.dp)
+                                .fillMaxWidth()
+                                .onSizeChanged {
+                                    rowSize = it
+                                }, horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                for (i in 0 until numberOfImages) Icon(
+                                    imageVector = ImageVector.vectorResource(
+                                        id = R.drawable.ic_disk_image_large
+                                    ),
+                                    modifier = Modifier.size(imageWidth.dp),
+                                    contentDescription = "",
+                                )
+                            }
+
+                            val bgColor = MaterialTheme.colorScheme.background
                             Icon(
                                 imageVector = ImageVector.vectorResource(
-                                    id = R.drawable.ic_magnifying_glass
+                                    id = R.drawable.ic_usb_stick_large
                                 ),
                                 modifier = Modifier
-                                    .constrainAs(magnifyingGlass) {
-                                        top.linkTo(imagesRow.top, 24.dp)
-                                        start.linkTo(usbDrive.start, 224.dp)
+                                    .constrainAs(usbDrive) {
+                                        centerTo(parent)
                                     }
-                                    .size(96.dp),
+                                    .padding(
+                                        // If we are verifying, the USB drive should be on the left
+                                        // Invert if we're in RTL mode
+                                        if (!(uiState.isVerifying xor (LocalLayoutDirection.current == LayoutDirection.Ltr)))
+                                            PaddingValues(end = 128.dp)
+                                        else
+                                            PaddingValues(start = 128.dp)
+                                    )
+                                    .drawBehind {
+                                        drawRect(bgColor,
+                                            topLeft = with(density) {
+                                                Offset(
+                                                    88.dp.toPx(),
+                                                    22.dp.toPx()
+                                                )
+                                            },
+                                            size = with(density) {
+                                                DpSize(
+                                                    80.dp,
+                                                    180.dp
+                                                ).toSize()
+                                            })
+                                    }
+                                    .size(256.dp),
                                 contentDescription = "",
                             )
+
+                            if (uiState.isVerifying) {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(
+                                        id = R.drawable.ic_magnifying_glass
+                                    ),
+                                    modifier = Modifier
+                                        .constrainAs(magnifyingGlass) {
+                                            top.linkTo(imagesRow.top, 24.dp)
+                                            absoluteLeft.linkTo(usbDrive.absoluteLeft, 224.dp)
+                                        }
+                                        .size(96.dp),
+                                    contentDescription = "",
+                                )
+                            }
                         }
                     }
                 }
@@ -850,7 +858,9 @@ fun SuccessView() {
             )
 
             Column(
-                modifier = Modifier.padding(32.dp),
+                modifier = Modifier
+                    .padding(32.dp)
+                    .rtlMirror(),
                 verticalArrangement = Arrangement.spacedBy(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -1079,11 +1089,13 @@ fun FatalErrorView(
         },
         icon = {
             Icon(
+                modifier = Modifier
+                    .size(256.dp)
+                    .rtlMirror(),
                 imageVector = ImageVector.vectorResource(
                     id = R.drawable.ic_write_to_usb_failed_large
                 ),
                 contentDescription = stringResource(R.string.error),
-                modifier = Modifier.size(256.dp),
             )
         },
         buttons = {
