@@ -16,6 +16,7 @@ jobs:
         variant:
           - Foss
           - Gplay
+      fail-fast: false
 
     env:
       JAVA_TOOL_OPTIONS: "-Xmx4g"
