@@ -12,8 +12,10 @@ import io.sentry.Breadcrumb
 import io.sentry.IScope
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import io.sentry.android.core.SentryAndroid
 import io.sentry.compose.SentryModifier.sentryTag
 import io.sentry.compose.SentryTraced
+import androidx.core.content.edit
 
 internal const val SENTRY_DSN =
     "https://39a6e220c97c585acd25ced5a6855b4d@o4508123221590016.ingest.de.sentry.io/4508123222704209"
@@ -106,14 +108,15 @@ object Telemetry : ITelemetry {
     override val isStub: Boolean
         get() = false
 
-    override var enabled: Boolean
+    override val enabled: Boolean
         get() = _enabled
-        set(value) {
-            sharedPrefs.edit().putBoolean(PREFS_ENABLED_KEY, value).apply()
-            reinit(value)
-        }
 
-    private fun reinit(enabled: Boolean) {
+    override fun setEnabled(context: Context, enabled: Boolean) {
+        sharedPrefs.edit { putBoolean(PREFS_ENABLED_KEY, enabled) }
+        reinit(context, enabled)
+    }
+
+    private fun reinit(context: Context, enabled: Boolean) {
         if (_enabled == enabled)
             return
         _enabled = enabled
@@ -122,7 +125,7 @@ object Telemetry : ITelemetry {
         if (!enabled) {
             Sentry.close()
         } else {
-            Sentry.init {
+            SentryAndroid.init(context) {
                 it.dsn = SENTRY_DSN
                 it.isEnableUserInteractionTracing = true
 
@@ -130,14 +133,14 @@ object Telemetry : ITelemetry {
                     it.environment = "debug"
                     it.tracesSampleRate = DEBUG_SAMPLE_RATE
                     it.profilesSampleRate = DEBUG_SAMPLE_RATE
-                    it.experimental.sessionReplay.sessionSampleRate = DEBUG_SAMPLE_RATE
-                    it.experimental.sessionReplay.onErrorSampleRate = DEBUG_ERROR_SAMPLE_RATE
+                    it.sessionReplay.sessionSampleRate = DEBUG_SAMPLE_RATE
+                    it.sessionReplay.onErrorSampleRate = DEBUG_ERROR_SAMPLE_RATE
                 } else {
                     it.environment = "production"
                     it.tracesSampleRate = PROD_SAMPLE_RATE
                     it.profilesSampleRate = PROD_SAMPLE_RATE
-                    it.experimental.sessionReplay.sessionSampleRate = PROD_SAMPLE_RATE
-                    it.experimental.sessionReplay.onErrorSampleRate = PROD_ERROR_SAMPLE_RATE
+                    it.sessionReplay.sessionSampleRate = PROD_SAMPLE_RATE
+                    it.sessionReplay.onErrorSampleRate = PROD_ERROR_SAMPLE_RATE
                 }
             }
         }
@@ -146,7 +149,7 @@ object Telemetry : ITelemetry {
     override fun init(context: Context) {
         sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         Log.i("Telemetry", "Enabled: ${sharedPrefs.getBoolean(PREFS_ENABLED_KEY, true)}")
-        reinit(sharedPrefs.getBoolean(PREFS_ENABLED_KEY, true))
+        reinit(context, sharedPrefs.getBoolean(PREFS_ENABLED_KEY, true))
     }
 
     override fun Modifier.telemetryTag(tag: String): Modifier {
@@ -162,10 +165,10 @@ object Telemetry : ITelemetry {
         content: @Composable (BoxScope.() -> Unit),
     ) {
         SentryTraced(
-                tag = tag,
-                modifier = modifier,
-                enableUserInteractionTracing = enableUserInteractionTracing,
-                content = content
+            tag = tag,
+            modifier = modifier,
+            enableUserInteractionTracing = enableUserInteractionTracing,
+            content = content
         )
     }
 

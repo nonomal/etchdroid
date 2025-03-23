@@ -8,7 +8,9 @@ import androidx.compose.ui.Modifier
 
 interface ITelemetry {
     val isStub: Boolean
-    var enabled: Boolean get() = !isStub; set(value) {}
+    val enabled: Boolean get() = !isStub
+
+    fun setEnabled(context: Context, enabled: Boolean) {}
 
     fun init(context: Context) {}
 
