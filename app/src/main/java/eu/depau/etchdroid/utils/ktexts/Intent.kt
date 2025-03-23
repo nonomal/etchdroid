@@ -21,7 +21,7 @@ inline fun <reified T> Intent.safeParcelableExtra(key: String): T? {
 }
 
 val Intent.usbDevice: UsbDevice?
-    get() = safeParcelableExtra(UsbManager.EXTRA_DEVICE)
+    get() = safeParcelableExtra<UsbDevice?>(UsbManager.EXTRA_DEVICE)
 
 fun Intent.broadcastLocally(context: Context) {
     LocalBroadcastManager.getInstance(context).sendBroadcast(this)

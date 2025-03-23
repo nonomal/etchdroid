@@ -138,7 +138,7 @@ fun Intent.getProgressActivityPendingIntent(
     context: Context, requestCode: Int = Random().nextInt(),
 ): PendingIntent = PendingIntent.getActivity(context, requestCode, this.apply {
     // Set data uri to propagate the permission
-    if (data == null) data = safeParcelableExtra("sourceUri")
+    if (data == null) data = safeParcelableExtra<Uri?>("sourceUri")
     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
     addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
