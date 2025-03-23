@@ -12,6 +12,9 @@ interface ITelemetry {
 
     fun setEnabled(context: Context, enabled: Boolean) {}
 
+    @Suppress("FunctionName")
+    fun TESTS_ONLY_setTestMode(enabled: Boolean) {}
+
     fun init(context: Context) {}
 
     fun Modifier.telemetryTag(tag: String): Modifier

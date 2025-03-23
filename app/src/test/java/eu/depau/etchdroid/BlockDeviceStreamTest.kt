@@ -15,11 +15,16 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.robolectric.annotation.Config
+import tech.apter.junit.jupiter.robolectric.RobolectricExtension
 import java.io.IOException
 import java.lang.Math.min
 import java.nio.ByteBuffer
 
 @ExperimentalCoroutinesApi
+@ExtendWith(RobolectricExtension::class)
+@Config(application = EtchDroidApplication::class)
 class BlockDeviceInputStreamTest {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -263,6 +268,7 @@ class BlockDeviceInputStreamTest {
         @BeforeAll
         fun setUp() {
             DebugProbes.install()
+            setUpMockTelemetry()
         }
 
         @JvmStatic
@@ -273,8 +279,9 @@ class BlockDeviceInputStreamTest {
     }
 }
 
-@Suppress("BlockingMethodInNonBlockingContext")
 @ExperimentalCoroutinesApi
+@ExtendWith(RobolectricExtension::class)
+@Config(application = EtchDroidApplication::class)
 class BlockDeviceOutputStreamTest {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -505,7 +512,11 @@ class BlockDeviceOutputStreamTest {
 
         while (byteBuffer.hasRemaining()) {
             val byteArray =
-                ByteArray((testBlockSize * testBufferBlocks).coerceAtMost(byteBuffer.remaining().toLong()).toInt())
+                ByteArray(
+                    (testBlockSize * testBufferBlocks).coerceAtMost(
+                        byteBuffer.remaining().toLong()
+                    ).toInt()
+                )
             byteBuffer.get(byteArray)
             outputStream.writeAsync(byteArray)
         }
@@ -521,6 +532,7 @@ class BlockDeviceOutputStreamTest {
         @BeforeAll
         fun setUp() {
             DebugProbes.install()
+            setUpMockTelemetry()
         }
 
         @JvmStatic

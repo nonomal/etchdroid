@@ -20,6 +20,7 @@ import io.sentry.SentryLevel
 import io.sentry.android.core.SentryAndroid
 import io.sentry.compose.SentryModifier.sentryTag
 import io.sentry.compose.SentryTraced
+import eu.depau.etchdroid.plugins.telemetry.DummyTelemetry.telemetryTag as dummyTelemetryTag
 
 internal const val SENTRY_DSN =
     "https://39a6e220c97c585acd25ced5a6855b4d@o4508123221590016.ingest.de.sentry.io/4508123222704209"
@@ -121,20 +122,25 @@ internal fun sentryScopeAdapter(scope: IScope): ITelemetryScope {
 object Telemetry : ITelemetry {
     private lateinit var sharedPrefs: SharedPreferences
     private var _enabled: Boolean = false
+    private var _test_mode: Boolean = false
 
     override val isStub: Boolean
         get() = false
 
     override val enabled: Boolean
-        get() = _enabled
+        get() = _enabled and !_test_mode
 
     override fun setEnabled(context: Context, enabled: Boolean) {
         sharedPrefs.edit { putBoolean(PREFS_ENABLED_KEY, enabled) }
         reinit(context, enabled)
     }
 
+    override fun TESTS_ONLY_setTestMode(enabled: Boolean) {
+        _test_mode = enabled
+    }
+
     private fun reinit(context: Context, enabled: Boolean) {
-        if (_enabled == enabled)
+        if (_enabled == enabled || _test_mode)
             return
         _enabled = enabled
         Log.i("Telemetry", "Enabled: $enabled")
@@ -172,7 +178,11 @@ object Telemetry : ITelemetry {
     }
 
     override fun Modifier.telemetryTag(tag: String): Modifier {
-        return sentryTag(tag)
+        return if (enabled)
+            sentryTag(tag)
+        else
+            dummyTelemetryTag(tag)
+
     }
 
     @OptIn(ExperimentalComposeUiApi::class)
@@ -183,6 +193,14 @@ object Telemetry : ITelemetry {
         enableUserInteractionTracing: Boolean,
         content: @Composable (BoxScope.() -> Unit),
     ) {
+        if (!enabled) {
+            return DummyTelemetry.TelemetryTracedImpl(
+                tag,
+                modifier,
+                enableUserInteractionTracing,
+                content
+            )
+        }
         SentryTraced(
             tag = tag,
             modifier = modifier,
@@ -192,12 +210,18 @@ object Telemetry : ITelemetry {
     }
 
     override fun configureScope(callback: ITelemetryScope.() -> Unit) {
+        if (!enabled)
+            return DummyTelemetry.configureScope(callback)
+
         Sentry.configureScope {
             sentryScopeAdapter(it).callback()
         }
     }
 
     override fun captureException(throwable: Throwable): String {
+        if (!enabled)
+            return DummyTelemetry.captureException(throwable)
+
         Firebase.crashlytics.recordException(throwable)
         return Sentry.captureException(throwable).toString()
     }
@@ -206,6 +230,9 @@ object Telemetry : ITelemetry {
         throwable: Throwable,
         callback: ITelemetryScope.() -> Unit,
     ): String {
+        if (!enabled)
+            return DummyTelemetry.captureException(throwable, callback)
+
         val result = Sentry.captureException(throwable) {
             sentryScopeAdapter(it).callback()
         }.toString()
@@ -214,28 +241,43 @@ object Telemetry : ITelemetry {
     }
 
     override fun addBreadcrumb(breadcrumb: TelemetryBreadcrumb) {
+        if (!enabled)
+            return DummyTelemetry.addBreadcrumb(breadcrumb)
+
         breadcrumb.log()
         Firebase.crashlytics.setCustomKeys(breadcrumb.toFirebase())
         Sentry.addBreadcrumb(breadcrumb.toSentry())
     }
 
     override fun addBreadcrumb(message: String) {
+        if (!enabled)
+            return DummyTelemetry.addBreadcrumb(message)
+
         Firebase.crashlytics.log(message)
         addBreadcrumb(TelemetryBreadcrumb.info(message))
     }
 
     override fun addBreadcrumb(message: String, category: String) {
+        if (!enabled)
+            return DummyTelemetry.addBreadcrumb(message, category)
+
         Firebase.crashlytics.log("$category: $message")
         addBreadcrumb(TelemetryBreadcrumb.info(message, category))
     }
 
     override fun addBreadcrumb(scope: TelemetryBreadcrumb.() -> Unit) {
+        if (!enabled)
+            return DummyTelemetry.addBreadcrumb(scope)
+
         val breadcrumb = TelemetryBreadcrumb()
         breadcrumb.scope()
         addBreadcrumb(breadcrumb)
     }
 
     override fun captureMessage(message: String): String {
+        if (!enabled)
+            return DummyTelemetry.captureMessage(message)
+
         TelemetryBreadcrumb.error(message).log()
         Firebase.crashlytics.log(message)
         return Sentry.captureMessage(message).toString()
@@ -245,6 +287,9 @@ object Telemetry : ITelemetry {
         message: String,
         callback: ITelemetryScope.() -> Unit,
     ): String {
+        if (!enabled)
+            return DummyTelemetry.captureMessage(message, callback)
+
         TelemetryBreadcrumb.error(message).log()
         Firebase.crashlytics.log(message)
         return Sentry.captureMessage(message) {
@@ -256,6 +301,9 @@ object Telemetry : ITelemetry {
         message: String,
         level: TelemetryLevel,
     ): String {
+        if (!enabled)
+            return DummyTelemetry.captureMessage(message, level)
+
         TelemetryBreadcrumb(level = level, message = message).log()
         Firebase.crashlytics.log(message)
         return Sentry.captureMessage(message, level.toSentry()).toString()
@@ -266,6 +314,9 @@ object Telemetry : ITelemetry {
         level: TelemetryLevel,
         callback: ITelemetryScope.() -> Unit,
     ): String {
+        if (!enabled)
+            return DummyTelemetry.captureMessage(message, level, callback)
+
         TelemetryBreadcrumb(level = level, message = message).log()
         Firebase.crashlytics.log(message)
         return Sentry.captureMessage(message, level.toSentry()) {

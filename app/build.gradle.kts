@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.android.junit5)
+    alias(libs.plugins.robolectric.junit5)
 
     if (System.getProperty("etchdroid.isGPlayFlavor") == "true" || System.getenv("ETCHDROID_ENABLE_SENTRY") == "true") {
         println("EtchDroid: Sentry and Crashlytics enabled")
@@ -87,6 +88,9 @@ android {
         buildConfig = true
     }
     testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
         unitTests.all {
             it.useJUnitPlatform()
             it.maxHeapSize = "4g"
@@ -134,6 +138,7 @@ dependencies {
 
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.mockito.core)
+    testImplementation(libs.robolectric)
     testImplementation(libs.test.core)
 
     if (System.getProperty("etchdroid.isGPlayFlavor") == "true" || System.getenv("ETCHDROID_ENABLE_SENTRY") == "true") {
