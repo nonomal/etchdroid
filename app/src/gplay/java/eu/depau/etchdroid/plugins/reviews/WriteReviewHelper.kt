@@ -3,7 +3,7 @@ package eu.depau.etchdroid.plugins.reviews
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import com.google.android.play.core.review.ReviewInfo
 import com.google.android.play.core.review.ReviewManagerFactory
 import eu.depau.etchdroid.plugins.telemetry.Telemetry
@@ -68,7 +68,7 @@ class WriteReviewHelper(private val mActivity: Activity) : IWriteReviewHelper {
         context.startActivity(
             Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse("https://play.google.com/store/apps/details?id=${context.packageName}")
+                "https://play.google.com/store/apps/details?id=${context.packageName}".toUri()
             )
         )
     }

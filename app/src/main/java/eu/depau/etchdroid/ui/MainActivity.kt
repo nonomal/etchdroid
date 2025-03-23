@@ -93,6 +93,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.net.toUri
 import eu.depau.etchdroid.AppSettings
 import eu.depau.etchdroid.PRIVACY_URL
 import eu.depau.etchdroid.R
@@ -634,7 +635,7 @@ fun StartView(
                             context.startActivity(
                                 Intent(
                                     Intent.ACTION_VIEW,
-                                    Uri.parse(PRIVACY_URL)
+                                    PRIVACY_URL.toUri()
                                 )
                             )
                         },
