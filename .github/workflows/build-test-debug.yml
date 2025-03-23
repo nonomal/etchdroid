@@ -33,6 +33,9 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Set up mock Firebase config
+        run: cp app/mock-google-services.json app/google-services.json
+
       - name: Build ${{ matrix.variant }}
         run: ./gradlew assemble${{ matrix.variant }}Debug
         env:
