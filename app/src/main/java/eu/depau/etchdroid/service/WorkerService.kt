@@ -1,9 +1,9 @@
 package eu.depau.etchdroid.service
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
@@ -83,9 +83,7 @@ class WorkerService : LifecycleService() {
     private var mVerificationCancelled = false
 
     private val mNotificationManager by lazy {
-        getSystemService(
-            Context.NOTIFICATION_SERVICE
-        ) as NotificationManager
+        getSystemService(NOTIFICATION_SERVICE) as NotificationManager
     }
 
     private val notificationsAllowed: Boolean
@@ -256,7 +254,7 @@ class WorkerService : LifecycleService() {
 
     private fun ensureWakelock() {
         if (mWakeLock == null) {
-            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+            val pm = getSystemService(POWER_SERVICE) as PowerManager
             mWakeLock = pm.newWakeLock(
                 PowerManager.PARTIAL_WAKE_LOCK, "EtchDroid::WorkerService[$mProgressNotificationId]"
             )
@@ -306,7 +304,7 @@ class WorkerService : LifecycleService() {
 
             if (mNotificationsSetUp) {
                 val notificationManager =
-                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    getSystemService(NOTIFICATION_SERVICE) as NotificationManager
                 try {
                     notificationManager.cancel(mJobId)
                 } catch (e: Exception) {
@@ -647,6 +645,7 @@ object WorkerServiceFlowImpl {
         }
     }
 
+    @SuppressLint("WrongSdkInt")
     suspend fun verifyImage(
         rawSourceStream: InputStream,
         blockDev: BlockDeviceDriver,
