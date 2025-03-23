@@ -1059,7 +1059,7 @@ fun StartViewPreview() {
                     )
                 )
             },
-            onCTAClick = { /*TODO*/ },
+            onCTAClick = { },
         )
     }
 }
@@ -1071,8 +1071,8 @@ fun WindowsAlertDialogPreview() {
 
     MainView(viewModel) {
         WindowsImageAlertDialog(
-            onDismissRequest = { /*TODO*/ }, onConfirm = { /*TODO*/ },
-            onCancel = { /*TODO*/ })
+            onDismissRequest = { }, onConfirm = { },
+            onCancel = { })
     }
 }
 
@@ -1083,8 +1083,8 @@ fun TelemetryAlertDialogPreview() {
 
     MainView(viewModel) {
         TelemetryAlertDialog(
-            onDismissRequest = { /*TODO*/ }, onOptOut = { /*TODO*/ },
-            onCancel = { /*TODO*/ })
+            onDismissRequest = { }, onOptOut = { },
+            onCancel = { })
     }
 }
 
