@@ -11,11 +11,12 @@ plugins {
     alias(libs.plugins.android.junit5)
 
     if (System.getProperty("etchdroid.isGPlayFlavor") == "true" || System.getenv("ETCHDROID_ENABLE_SENTRY") == "true") {
-        println("EtchDroid: Sentry enabled")
-//        alias(libs.plugins.gplay.sentry)
+        println("EtchDroid: Sentry and Crashlytics enabled")
         alias(libs.plugins.gplay.sentry.kotlin)
+        alias(libs.plugins.google.gms.google.services)
+        alias(libs.plugins.google.firebase.crashlytics)
     } else {
-        println("EtchDroid: Sentry not enabled")
+        println("EtchDroid: Sentry and Crashlytics not enabled")
     }
 }
 
@@ -134,4 +135,8 @@ dependencies {
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.mockito.core)
     testImplementation(libs.test.core)
+
+    if (System.getProperty("etchdroid.isGPlayFlavor") == "true" || System.getenv("ETCHDROID_ENABLE_SENTRY") == "true") {
+        implementation(libs.firebase.crashlytics)
+    }
 }

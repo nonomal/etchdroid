@@ -25,5 +25,10 @@
         <meta-data
             android:name="io.sentry.attach-view-hierarchy"
             android:value="true" />
+
+        <!-- disable crashlytics by default; enabled if user has opted in -->
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
     </application>
 </manifest>

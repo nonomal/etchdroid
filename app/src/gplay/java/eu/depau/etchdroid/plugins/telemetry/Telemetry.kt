@@ -7,6 +7,11 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.core.content.edit
+import com.google.firebase.crashlytics.CustomKeysAndValues
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import eu.depau.etchdroid.BuildConfig
 import io.sentry.Breadcrumb
 import io.sentry.IScope
@@ -15,7 +20,6 @@ import io.sentry.SentryLevel
 import io.sentry.android.core.SentryAndroid
 import io.sentry.compose.SentryModifier.sentryTag
 import io.sentry.compose.SentryTraced
-import androidx.core.content.edit
 
 internal const val SENTRY_DSN =
     "https://39a6e220c97c585acd25ced5a6855b4d@o4508123221590016.ingest.de.sentry.io/4508123222704209"
@@ -62,6 +66,17 @@ internal fun TelemetryBreadcrumb.toSentry(): Breadcrumb {
     return sentry
 }
 
+internal fun TelemetryBreadcrumb.toFirebase(): CustomKeysAndValues {
+    return CustomKeysAndValues.Builder().apply {
+        message?.let { putString("message", it) }
+        category?.let { putString("category", it) }
+        level?.let { putString("level", it.name) }
+        type?.let { putString("type", it) }
+        data.forEach { (key, value) -> putString(key, value.toString()) }
+        origin?.let { putString("origin", it) }
+    }.build()
+}
+
 internal fun sentryScopeAdapter(scope: IScope): ITelemetryScope {
     return object : ITelemetryScope {
         override var logLevel: TelemetryLevel?
@@ -85,6 +100,7 @@ internal fun sentryScopeAdapter(scope: IScope): ITelemetryScope {
 
         override fun setTag(key: String, value: String) {
             scope.setTag(key, value)
+            Firebase.crashlytics.setCustomKey(key, value)
         }
 
         override fun removeTag(key: String) {
@@ -93,6 +109,7 @@ internal fun sentryScopeAdapter(scope: IScope): ITelemetryScope {
 
         override fun setExtra(key: String, value: String) {
             scope.setExtra(key, value)
+            Firebase.crashlytics.setCustomKey(key, value)
         }
 
         override fun removeExtra(key: String) {
@@ -121,6 +138,8 @@ object Telemetry : ITelemetry {
             return
         _enabled = enabled
         Log.i("Telemetry", "Enabled: $enabled")
+
+        FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = enabled
 
         if (!enabled) {
             Sentry.close()
@@ -179,6 +198,7 @@ object Telemetry : ITelemetry {
     }
 
     override fun captureException(throwable: Throwable): String {
+        Firebase.crashlytics.recordException(throwable)
         return Sentry.captureException(throwable).toString()
     }
 
@@ -186,21 +206,26 @@ object Telemetry : ITelemetry {
         throwable: Throwable,
         callback: ITelemetryScope.() -> Unit,
     ): String {
-        return Sentry.captureException(throwable) {
+        val result = Sentry.captureException(throwable) {
             sentryScopeAdapter(it).callback()
         }.toString()
+        Firebase.crashlytics.recordException(throwable)
+        return result
     }
 
     override fun addBreadcrumb(breadcrumb: TelemetryBreadcrumb) {
         breadcrumb.log()
+        Firebase.crashlytics.setCustomKeys(breadcrumb.toFirebase())
         Sentry.addBreadcrumb(breadcrumb.toSentry())
     }
 
     override fun addBreadcrumb(message: String) {
+        Firebase.crashlytics.log(message)
         addBreadcrumb(TelemetryBreadcrumb.info(message))
     }
 
     override fun addBreadcrumb(message: String, category: String) {
+        Firebase.crashlytics.log("$category: $message")
         addBreadcrumb(TelemetryBreadcrumb.info(message, category))
     }
 
@@ -212,6 +237,7 @@ object Telemetry : ITelemetry {
 
     override fun captureMessage(message: String): String {
         TelemetryBreadcrumb.error(message).log()
+        Firebase.crashlytics.log(message)
         return Sentry.captureMessage(message).toString()
     }
 
@@ -220,6 +246,7 @@ object Telemetry : ITelemetry {
         callback: ITelemetryScope.() -> Unit,
     ): String {
         TelemetryBreadcrumb.error(message).log()
+        Firebase.crashlytics.log(message)
         return Sentry.captureMessage(message) {
             sentryScopeAdapter(it).callback()
         }.toString()
@@ -230,6 +257,7 @@ object Telemetry : ITelemetry {
         level: TelemetryLevel,
     ): String {
         TelemetryBreadcrumb(level = level, message = message).log()
+        Firebase.crashlytics.log(message)
         return Sentry.captureMessage(message, level.toSentry()).toString()
     }
 
@@ -239,6 +267,7 @@ object Telemetry : ITelemetry {
         callback: ITelemetryScope.() -> Unit,
     ): String {
         TelemetryBreadcrumb(level = level, message = message).log()
+        Firebase.crashlytics.log(message)
         return Sentry.captureMessage(message, level.toSentry()) {
             sentryScopeAdapter(it).callback()
         }.toString()

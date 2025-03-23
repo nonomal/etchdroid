@@ -24,19 +24,23 @@ mockito = "5.8.0"
 test-core = "1.6.1"
 test-runner = "1.6.2"
 
-# Note for F-Droid developers: Sentry is not enabled for F-Droid builds
+# Note for F-Droid developers: Sentry and Firebase are not enabled for F-Droid builds
 sentry-lib = "8.4.0"
 sentry-plugin = "4.12.0"
+firebase-crashlytics = "19.4.2"
+google-gms-google-services = "4.4.2"
+google-firebase-crashlytics = "3.0.3"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "android-junit5" }
 android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-gplay-sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
 gplay-sentry-kotlin = { id = "io.sentry.kotlin.compiler.gradle", version.ref = "sentry-plugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "kotlin-parcelize" }
+google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "google-gms-google-services" }
+google-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "google-firebase-crashlytics" }
 
 [libraries]
 accompanist-navigation-animation = { group = "com.google.accompanist", name = "accompanist-navigation-animation", version.ref = "accompanist" }
@@ -73,3 +77,4 @@ material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "ad
 mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 test-core = { group = "androidx.test", name = "core", version.ref = "test-core" }
 test-runner = { group = "androidx.test", name = "runner", version.ref = "test-runner" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebase-crashlytics" }
