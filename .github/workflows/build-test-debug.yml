@@ -43,6 +43,6 @@ jobs:
           ETCHDROID_ENABLE_SENTRY: ${{ matrix.variant == 'Gplay' }}
 
       - name: Run unit tests for ${{ matrix.variant }}
-        run: ./gradlew test${{ matrix.variant }}UnitTest
+        run: ./gradlew test${{ matrix.variant }}DebugUnitTest
         env:
           ETCHDROID_ENABLE_SENTRY: ${{ matrix.variant == 'Gplay' }}
