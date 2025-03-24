@@ -37,6 +37,15 @@ jobs:
           gradle-version: wrapper
           cache-read-only: false
 
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ matrix.variant }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/libs.versions.toml') }}
+          restore-keys: |
+            gradle-${{ matrix.variant }}-
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
