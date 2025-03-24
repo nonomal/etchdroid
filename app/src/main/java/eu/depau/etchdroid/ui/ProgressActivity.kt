@@ -95,6 +95,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.net.toUri
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.compose.LottieAnimation
@@ -453,28 +454,29 @@ fun JobInProgressView(
             var clickCount by remember { mutableStateOf(0) }
             var easterEgg by remember { mutableStateOf(false) }
 
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .clipToBounds()
-                .clickable {
-                    val now = System.currentTimeMillis()
-                    if (now - clickLastTime < 500) {
-                        clickCount++
-                        if (clickCount >= 5) {
-                            clickCount = 0
-                            easterEgg = !easterEgg
-                            Telemetry.addBreadcrumb {
-                                message = "Easter egg activated: $easterEgg"
-                                category = "easter_egg"
-                                level = TelemetryLevel.DEBUG
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clipToBounds()
+                    .clickable {
+                        val now = System.currentTimeMillis()
+                        if (now - clickLastTime < 500) {
+                            clickCount++
+                            if (clickCount >= 5) {
+                                clickCount = 0
+                                easterEgg = !easterEgg
+                                Telemetry.addBreadcrumb {
+                                    message = "Easter egg activated: $easterEgg"
+                                    category = "easter_egg"
+                                    level = TelemetryLevel.DEBUG
+                                }
                             }
+                        } else {
+                            clickCount = 0
                         }
-                    } else {
-                        clickCount = 0
+                        clickLastTime = now
                     }
-                    clickLastTime = now
-                }
-                .then(modifier)
+                    .then(modifier)
             ) {
                 if (easterEgg) {
                     GifImage(
@@ -509,11 +511,12 @@ fun JobInProgressView(
                             val anchor by anchorTransition.animateValue(
                                 initialValue = if (uiState.isVerifying) 100.dp else (100 + repeatWidth).dp,
                                 targetValue = if (uiState.isVerifying) (100 + repeatWidth).dp else 100.dp,
-                                typeConverter = TwoWayConverter(convertToVector = {
-                                    AnimationVector1D(
-                                        it.value
-                                    )
-                                },
+                                typeConverter = TwoWayConverter(
+                                    convertToVector = {
+                                        AnimationVector1D(
+                                            it.value
+                                        )
+                                    },
                                     convertFromVector = { it.value.dp }),
                                 animationSpec = infiniteRepeatable(
                                     animation = tween(2000, easing = LinearEasing),
@@ -522,20 +525,21 @@ fun JobInProgressView(
                                 label = "anchor"
                             )
 
-                            Row(modifier = Modifier
-                                .constrainAs(imagesRow) {
-                                    centerVerticallyTo(usbDrive)
-                                    if (uiState.isVerifying) {
-                                        absoluteLeft.linkTo(usbDrive.absoluteLeft, anchor)
-                                    } else {
-                                        absoluteRight.linkTo(usbDrive.absoluteRight, anchor)
+                            Row(
+                                modifier = Modifier
+                                    .constrainAs(imagesRow) {
+                                        centerVerticallyTo(usbDrive)
+                                        if (uiState.isVerifying) {
+                                            absoluteLeft.linkTo(usbDrive.absoluteLeft, anchor)
+                                        } else {
+                                            absoluteRight.linkTo(usbDrive.absoluteRight, anchor)
+                                        }
                                     }
-                                }
-                                .padding(bottom = 32.dp)
-                                .fillMaxWidth()
-                                .onSizeChanged {
-                                    rowSize = it
-                                }, horizontalArrangement = Arrangement.SpaceBetween
+                                    .padding(bottom = 32.dp)
+                                    .fillMaxWidth()
+                                    .onSizeChanged {
+                                        rowSize = it
+                                    }, horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 for (i in 0 until numberOfImages) Icon(
                                     imageVector = ImageVector.vectorResource(
@@ -564,7 +568,8 @@ fun JobInProgressView(
                                             PaddingValues(start = 128.dp)
                                     )
                                     .drawBehind {
-                                        drawRect(bgColor,
+                                        drawRect(
+                                            bgColor,
                                             topLeft = with(density) {
                                                 Offset(
                                                     88.dp.toPx(),
@@ -903,7 +908,7 @@ fun SuccessView() {
                 activity?.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse("https://etchdroid.app/donate/")
+                        "https://etchdroid.app/donate/".toUri()
                     )
                 )
             }) {
@@ -1106,7 +1111,7 @@ fun FatalErrorView(
                 activity?.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse("https://github.com/EtchDroid/EtchDroid/issues")
+                        "https://github.com/etchdroid/etchdroid/issues".toUri()
                     )
                 )
             }) {

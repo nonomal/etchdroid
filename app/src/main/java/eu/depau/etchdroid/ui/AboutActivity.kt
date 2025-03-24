@@ -2,7 +2,6 @@ package eu.depau.etchdroid.ui
 
 import android.content.Intent
 import android.graphics.Typeface
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -45,6 +44,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import eu.depau.etchdroid.AppSettings
 import eu.depau.etchdroid.BuildConfig
 import eu.depau.etchdroid.PRIVACY_URL
@@ -314,7 +314,7 @@ fun AboutView(viewModel: ThemeViewModel) {
                     activity?.startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
-                            Uri.parse("https://etchdroid.app")
+                            "https://etchdroid.app".toUri()
                         )
                     )
                 }
@@ -326,7 +326,7 @@ fun AboutView(viewModel: ThemeViewModel) {
                     activity?.startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
-                            Uri.parse("https://etchdroid.app/donate")
+                            "https://etchdroid.app/donate".toUri()
                         )
                     )
                 }

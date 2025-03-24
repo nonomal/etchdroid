@@ -16,7 +16,6 @@ open class UsbCommunicationException(
     "Communication failed", cause
 ) {
     override fun getUiMessage(context: Context): String {
-        // TODO extract to string resources
         val rootCause = rootCause
         if (rootCause is LibusbException) {
             val error = rootCause.libusbError

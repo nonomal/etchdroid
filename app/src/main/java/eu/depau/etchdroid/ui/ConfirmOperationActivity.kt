@@ -77,6 +77,7 @@ import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.atLeastWrapContent
+import androidx.core.net.toUri
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -862,9 +863,7 @@ fun ConfirmationViewPreview() {
                             vidpid = "dead:beef",
                         )
                     ),
-                    openedImage = Uri.parse(
-                        "file:///storage/emulated/0/Download/etchdroid-test-image-very-long-name-lol-rip-ive-never-seen-a-filename-this-long-its-absolutely-crazy.img"
-                    ),
+                    openedImage = "file:///storage/emulated/0/Download/etchdroid-test-image-very-long-name-lol-rip-ive-never-seen-a-filename-this-long-its-absolutely-crazy.img".toUri(),
                 )
             )
         }

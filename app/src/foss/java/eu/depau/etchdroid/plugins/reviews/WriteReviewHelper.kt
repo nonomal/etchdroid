@@ -2,7 +2,7 @@ package eu.depau.etchdroid.plugins.reviews
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 
 class WriteReviewHelper(private val mActivity: Activity) : IWriteReviewHelper {
     override val isGPlayFlavor: Boolean
@@ -10,10 +10,7 @@ class WriteReviewHelper(private val mActivity: Activity) : IWriteReviewHelper {
 
     override fun launchReviewFlow() {
         mActivity.startActivity(
-                Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("https://github.com/EtchDroid/EtchDroid/")
-                )
+            Intent(Intent.ACTION_VIEW, "https://github.com/EtchDroid/EtchDroid/".toUri())
         )
     }
 }

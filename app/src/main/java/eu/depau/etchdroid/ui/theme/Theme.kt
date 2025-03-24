@@ -104,10 +104,6 @@ fun EtchDroidTheme(
         val currentWindow = (view.context as? Activity)?.window
             ?: throw Exception("Not in an activity - unable to get Window reference")
         SideEffect {
-            currentWindow.apply {
-                statusBarColor = Color.TRANSPARENT
-                navigationBarColor = Color.TRANSPARENT
-            }
             WindowCompat.getInsetsController(currentWindow, view).apply {
                 isAppearanceLightStatusBars = !darkTheme
                 isAppearanceLightNavigationBars = !darkTheme

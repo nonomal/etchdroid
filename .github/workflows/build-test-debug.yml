@@ -1,0 +1,74 @@
+name: Build and test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-matrix:
+    name: Build and test variant ${{ matrix.variant }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        variant:
+          - foss
+          - gplay
+      fail-fast: false
+
+    env:
+      JAVA_TOOL_OPTIONS: "-Xmx4g"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: wrapper
+          cache-read-only: false
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ matrix.variant }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/libs.versions.toml') }}
+          restore-keys: |
+            gradle-${{ matrix.variant }}-
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Firebase config
+        run: |
+          cat <<'EOF' > app/google-services.json
+          ${{ secrets.GOOGLE_SERVICES_JSON }}
+          EOF
+
+      - name: Build ${{ matrix.variant }}
+        run: ./gradlew assemble${VARIANT^}Debug
+        env:
+          ETCHDROID_ENABLE_SENTRY: ${{ matrix.variant == 'Gplay' }}
+          VARIANT: ${{ matrix.variant }}
+
+      - name: Run unit tests for ${{ matrix.variant }}
+        run: ./gradlew test${VARIANT^}DebugUnitTest
+        env:
+          ETCHDROID_ENABLE_SENTRY: ${{ matrix.variant == 'Gplay' }}
+          VARIANT: ${{ matrix.variant }}
+
+      - name: Upload built APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-${{ matrix.variant }}-debug
+          path: app/build/outputs/apk/${{ matrix.variant }}/debug/app-${{ matrix.variant }}-debug.apk

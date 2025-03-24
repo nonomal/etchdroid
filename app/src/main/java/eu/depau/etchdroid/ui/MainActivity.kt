@@ -93,6 +93,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.net.toUri
 import eu.depau.etchdroid.AppSettings
 import eu.depau.etchdroid.PRIVACY_URL
 import eu.depau.etchdroid.R
@@ -260,7 +261,7 @@ class MainActivity : ActivityBase() {
             var telemetryDialogOpen by remember { mutableStateOf(false) }
 
             fun setTelemetry(enabled: Boolean) {
-                Telemetry.enabled = enabled
+                Telemetry.setEnabled(this.applicationContext, enabled)
                 mViewModel.setTelemetry(enabled)
             }
 
@@ -573,19 +574,24 @@ fun StartView(
                     onClick = { setThemeMode(ThemeMode.SYSTEM) },
                     text = { Text(stringResource(R.string.device_setting)) },
                     leadingIcon = {
-                        RadioButton(modifier = Modifier.size(20.dp),
+                        RadioButton(
+                            modifier = Modifier.size(20.dp),
                             selected = uiState.themeMode == ThemeMode.SYSTEM,
                             onClick = { setThemeMode(ThemeMode.SYSTEM) })
                     })
-                DropdownMenuItem(onClick = { setThemeMode(ThemeMode.LIGHT) },
+                DropdownMenuItem(
+                    onClick = { setThemeMode(ThemeMode.LIGHT) },
                     text = { Text(stringResource(R.string.light)) }, leadingIcon = {
-                        RadioButton(modifier = Modifier.size(20.dp),
+                        RadioButton(
+                            modifier = Modifier.size(20.dp),
                             selected = uiState.themeMode == ThemeMode.LIGHT,
                             onClick = { setThemeMode(ThemeMode.LIGHT) })
                     })
-                DropdownMenuItem(onClick = { setThemeMode(ThemeMode.DARK) },
+                DropdownMenuItem(
+                    onClick = { setThemeMode(ThemeMode.DARK) },
                     text = { Text(stringResource(R.string.dark)) }, leadingIcon = {
-                        RadioButton(modifier = Modifier.size(20.dp),
+                        RadioButton(
+                            modifier = Modifier.size(20.dp),
                             selected = uiState.themeMode == ThemeMode.DARK,
                             onClick = { setThemeMode(ThemeMode.DARK) })
                     })
@@ -595,7 +601,8 @@ fun StartView(
                         onClick = { setDynamicTheme(!uiState.dynamicColors) },
                         text = { Text(stringResource(R.string.dynamic_colors)) },
                         leadingIcon = {
-                            Checkbox(modifier = Modifier.size(20.dp),
+                            Checkbox(
+                                modifier = Modifier.size(20.dp),
                                 checked = uiState.dynamicColors,
                                 onCheckedChange = { setDynamicTheme(!uiState.dynamicColors) })
                         })
@@ -614,7 +621,8 @@ fun StartView(
                         onClick = { toggleTelemetry() },
                         text = { Text(stringResource(R.string.send_anonymous_data)) },
                         leadingIcon = {
-                            Checkbox(modifier = Modifier.size(20.dp),
+                            Checkbox(
+                                modifier = Modifier.size(20.dp),
                                 checked = Telemetry.enabled,
                                 onCheckedChange = { toggleTelemetry() }
                             )
@@ -627,7 +635,7 @@ fun StartView(
                             context.startActivity(
                                 Intent(
                                     Intent.ACTION_VIEW,
-                                    Uri.parse(PRIVACY_URL)
+                                    PRIVACY_URL.toUri()
                                 )
                             )
                         },
@@ -643,7 +651,8 @@ fun StartView(
 
                 HorizontalDivider()
 
-                DropdownMenuItem(onClick = { openAboutView() },
+                DropdownMenuItem(
+                    onClick = { openAboutView() },
                     text = { Text(stringResource(R.string.about)) }, leadingIcon = {
                         Icon(
                             imageVector = Icons.TwoTone.Info,
@@ -1051,7 +1060,7 @@ fun StartViewPreview() {
                     )
                 )
             },
-            onCTAClick = { /*TODO*/ },
+            onCTAClick = { },
         )
     }
 }
@@ -1062,8 +1071,9 @@ fun WindowsAlertDialogPreview() {
     val viewModel = remember { MainActivityViewModel() }
 
     MainView(viewModel) {
-        WindowsImageAlertDialog(onDismissRequest = { /*TODO*/ }, onConfirm = { /*TODO*/ },
-            onCancel = { /*TODO*/ })
+        WindowsImageAlertDialog(
+            onDismissRequest = { }, onConfirm = { },
+            onCancel = { })
     }
 }
 
@@ -1073,8 +1083,9 @@ fun TelemetryAlertDialogPreview() {
     val viewModel = remember { MainActivityViewModel() }
 
     MainView(viewModel) {
-        TelemetryAlertDialog(onDismissRequest = { /*TODO*/ }, onOptOut = { /*TODO*/ },
-            onCancel = { /*TODO*/ })
+        TelemetryAlertDialog(
+            onDismissRequest = { }, onOptOut = { },
+            onCancel = { })
     }
 }
 
@@ -1092,7 +1103,8 @@ fun UsbDevicePickerBottomSheetPreview() {
 
     MainView(viewModel) {
         Row(
-            Modifier.toggleable(value = openBottomSheet, role = Role.Checkbox,
+            Modifier.toggleable(
+                value = openBottomSheet, role = Role.Checkbox,
                 onValueChange = { checked -> openBottomSheet = checked })
         ) {
             Checkbox(checked = openBottomSheet, onCheckedChange = null)
@@ -1122,7 +1134,8 @@ fun EmptyUsbDevicePickerBottomSheetPreview() {
 
     MainView(viewModel) {
         Row(
-            Modifier.toggleable(value = openBottomSheet, role = Role.Checkbox,
+            Modifier.toggleable(
+                value = openBottomSheet, role = Role.Checkbox,
                 onValueChange = { checked -> openBottomSheet = checked })
         ) {
             Checkbox(checked = openBottomSheet, onCheckedChange = null)

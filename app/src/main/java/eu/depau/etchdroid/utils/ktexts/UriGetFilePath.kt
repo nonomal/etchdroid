@@ -7,6 +7,8 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
+import androidx.core.net.toUri
+import eu.depau.etchdroid.plugins.telemetry.Telemetry
 
 /**
  * Get a file path from a Uri. This will get the the path for Storage Access
@@ -42,15 +44,15 @@ fun Uri.getFilePath(context: Context): String? {
                 val id = DocumentsContract.getDocumentId(this)
 
                 if (id.startsWith("raw:/"))
-                    return Uri.parse(id).path
+                    return id.toUri().path
 
                 return try {
                     val contentUri = ContentUris.withAppendedId(
-                        Uri.parse("content://downloads/public_downloads"),
+                        "content://downloads/public_downloads".toUri(),
                         java.lang.Long.valueOf(id)
                     )
                     contentUri.getDataColumn(context, null, null)
-                } catch (e: NumberFormatException) {
+                } catch (_: NumberFormatException) {
                     null
                 }
             } else if (isMediaDocument) {
@@ -110,11 +112,15 @@ fun Uri.getDataColumn(
     val column = "_data"
     val projection = arrayOf(column)
 
-    context.contentResolver.query(this, projection, selection, selectionArgs, null)?.use {
-        if (it.moveToFirst()) {
-            val columnIndex = it.getColumnIndexOrThrow(column)
-            return it.getString(columnIndex)
+    try {
+        context.contentResolver.query(this, projection, selection, selectionArgs, null)?.use {
+            if (it.moveToFirst()) {
+                val columnIndex = it.getColumnIndexOrThrow(column)
+                return it.getString(columnIndex)
+            }
         }
+    } catch (e: SecurityException) {
+        Telemetry.captureException("getDataColumn: Failed to query content resolver", e)
     }
 
     return null

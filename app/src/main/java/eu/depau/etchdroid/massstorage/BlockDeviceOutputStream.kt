@@ -28,7 +28,6 @@ private const val TRACE_IO = false
  *
  * @param msg The message to print if tracing is enabled.
  */
-@JvmStatic
 private fun BlockDeviceOutputStream.traceIo(msg: String) {
     if (TRACE_IO) println("OSTREAM: ${Thread.currentThread().name} time ${System.nanoTime()} pos $mCurrentOffset $msg")
 }

@@ -14,10 +14,15 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.ExtendWith
+import org.robolectric.annotation.Config
+import tech.apter.junit.jupiter.robolectric.RobolectricExtension
 import java.io.IOException
 import java.util.Random
 
 @ExperimentalCoroutinesApi
+@ExtendWith(RobolectricExtension::class)
+@Config(application = EtchDroidApplication::class)
 class WorkerServiceFlowTest {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -197,6 +202,7 @@ class WorkerServiceFlowTest {
         @BeforeAll
         fun setUp() {
             DebugProbes.install()
+            setUpMockTelemetry()
         }
 
         @JvmStatic
