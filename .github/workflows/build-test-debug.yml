@@ -14,8 +14,8 @@ jobs:
     strategy:
       matrix:
         variant:
-          - Foss
-          - Gplay
+          - foss
+          - gplay
       fail-fast: false
 
     env:
@@ -40,15 +40,26 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Set up mock Firebase config
-        run: cp app/mock-google-services.json app/google-services.json
+      - name: Set up Firebase config
+        run: |
+          cat <<'EOF' > app/google-services.json
+          ${{ secrets.GOOGLE_SERVICES_JSON }}
+          EOF
 
       - name: Build ${{ matrix.variant }}
-        run: ./gradlew assemble${{ matrix.variant }}Debug
+        run: ./gradlew assemble${VARIANT^}Debug
         env:
           ETCHDROID_ENABLE_SENTRY: ${{ matrix.variant == 'Gplay' }}
+          VARIANT: ${{ matrix.variant }}
 
       - name: Run unit tests for ${{ matrix.variant }}
-        run: ./gradlew test${{ matrix.variant }}DebugUnitTest
+        run: ./gradlew test${VARIANT^}DebugUnitTest
         env:
           ETCHDROID_ENABLE_SENTRY: ${{ matrix.variant == 'Gplay' }}
+          VARIANT: ${{ matrix.variant }}
+
+      - name: Upload built APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-${{ matrix.variant }}-debug
+          path: app/build/outputs/apk/${{ matrix.variant }}/debug/app-${{ matrix.variant }}-debug.apk
